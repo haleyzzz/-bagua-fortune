@@ -71,8 +71,9 @@
   .screen{
     position:relative;
     z-index:1;
-    min-height:100vh;
-    min-height:100dvh;
+    /* 用 max(100vh, 像素下限) 兜底：避免预览面板自动撑高 iframe 中 100vh 塌成 0 导致内容不可见 */
+    min-height:max(100vh, 640px);
+    min-height:max(100dvh, 640px);
     display:flex;
     align-items:center;
     justify-content:center;
@@ -198,7 +199,7 @@
 
   /* ── 尾屏 · 免责 ── */
   .footer-screen{
-    min-height:auto;
+    min-height:max(40vh, 220px);
     padding:5vh 6vw 6vh;
   }
   .footer-note{
