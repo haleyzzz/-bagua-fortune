@@ -53,6 +53,15 @@
   .sx.禄 .t{background:var(--gold)} .sx.权 .t{background:var(--rose)} .sx.科 .t{background:var(--cyan)} .sx.忌 .t{background:#9a93b0}
   .sx .star{font-size:16px;color:var(--silver-bright);font-weight:600}
   .sx .to{font-size:12px;color:var(--gold);opacity:.85;margin-top:3px}
+  /* 流年 */
+  .zg.ln{box-shadow:0 0 0 1px color-mix(in srgb,var(--rose) 45%,transparent),0 0 14px rgba(255,142,184,.18)}
+  .zg.lnming{background:linear-gradient(180deg,rgba(255,142,184,.16),var(--panel));border-color:var(--rose)}
+  .badge.ln{color:var(--rose);border-color:color-mix(in srgb,var(--rose) 55%,transparent)}
+  .badge.lnming{color:#0a0e2a;background:var(--rose);border:none}
+  .ln-card .gp{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+  .ln-card .gp .g{flex:0 0 auto;background:var(--panel);border:1px solid color-mix(in srgb,var(--rose) 30%,transparent);border-radius:9px;padding:8px 12px;min-width:88px;text-align:center}
+  .ln-card .gp .g .nm{font-size:13px;color:var(--silver-bright);font-weight:600}
+  .ln-card .gp .g .st{font-size:11px;color:var(--gold);opacity:.85;margin-top:2px}
   /* 大限 */
   .dx-seq{display:flex;gap:8px;overflow-x:auto;padding-bottom:6px}
   .dx{flex:0 0 auto;text-align:center;background:var(--panel);border:1px solid color-mix(in srgb,var(--purple) 26%,transparent);
@@ -122,6 +131,7 @@
         </select>
       </div>
       <div class="col"><label>当前年龄(可选)</label><input id="zage" type="number" value="36" min="0"></div>
+      <div class="col"><label>流年年份(可选)</label><input id="zln" type="number" value="2026" min="1900" max="2100"></div>
     </div>
     <button class="btn" id="btn-ziwei">排 盘</button>
     <div class="err" id="err-ziwei"></div>
@@ -141,6 +151,17 @@
   function $(s){return document.querySelector(s);}
   function el(t,c,h){var e=document.createElement(t);if(c)e.className=c;if(h!=null)e.innerHTML=h;return e;}
   var BR_ORDER=["子","丑","寅","卯","辰","巳","午","未","申","酉","戌","亥"];
+  // 天干地支（算流年干支用）
+  var GAN=["甲","乙","丙","丁","戊","己","庚","辛","壬","癸"];
+  var ZHI=["子","丑","寅","卯","辰","巳","午","未","申","酉","戌","亥"];
+  // 紫微四化表：天干 -> [禄星,权星,科星,忌星]（中州派通用）
+  var GAN4={
+    "甲":["廉贞","破军","武曲","太阳"], "乙":["天机","天梁","紫微","太阴"],
+    "丙":["天同","天机","文昌","廉贞"], "丁":["太阴","天同","天机","巨门"],
+    "戊":["贪狼","太阴","右弼","天机"], "己":["武曲","贪狼","天梁","文曲"],
+    "庚":["太阳","武曲","太阴","天同"], "辛":["巨门","太阳","文曲","文昌"],
+    "壬":["天梁","紫微","左辅","武曲"], "癸":["破军","巨门","太阴","贪狼"]
+  };
 
   // 星点背景
   (function(){
@@ -179,11 +200,12 @@
       var solar=y+"-"+(m<10?"0":"")+m+"-"+(d<10?"0":"")+d;
       var a=iztro.astro.bySolar(solar, hh, $("#zgender").value, 'zh-CN');
       var age=$("#zage").value!==""?(+$("#zage").value):null;
-      renderZiwei(a,age);
+      var lnYear=$("#zln").value!==""?(+$("#zln").value):2026;
+      renderZiwei(a,age,lnYear);
     }catch(e){ err.style.display="block"; err.textContent="⚠ "+e.message; }
   });
 
-  function renderZiwei(a,age){
+  function renderZiwei(a,age,lnYear){
     var box=$("#ziwei-result"); box.innerHTML="";
 
     // 命宫 / 身宫
@@ -207,14 +229,40 @@
     var ZW_ORDER=['命宫','兄弟','夫妻','子女','财帛','疾厄','迁移','仆役','官禄','田宅','福德','父母'];
     var SF=['命宫','财帛','官禄','迁移']; // 命宫三方四正
     var sorted=a.palaces.slice().sort(function(x,y){return ZW_ORDER.indexOf(x.name)-ZW_ORDER.indexOf(y.name);});
+
+    // 流年（依斗数正统规则自算，不依赖 iztro 不稳定流年 API）
+    var gIdx=(lnYear-4)%10, zIdx=(lnYear-4)%12;
+    if(gIdx<0)gIdx+=10; if(zIdx<0)zIdx+=12;
+    var lnGan=GAN[gIdx], lnZhi=ZHI[zIdx];
+    var lnMing=sorted.filter(function(p){return p.earthlyBranch===lnZhi;})[0]||null;
+    var lnSF=new Set();
+    if(lnMing){
+      var ci=ZW_ORDER.indexOf(lnMing.name);
+      [4,6,8].forEach(function(o){ lnSF.add(sorted[(ci+o)%12].name); }); // 财帛+4 迁移+6 官禄+8
+    }
+    var lnActs={禄:[],权:[],科:[],忌:[]};
+    if(GAN4[lnGan]){
+      var sf4=GAN4[lnGan];
+      ["禄","权","科","忌"].forEach(function(t,i){
+        var star=sf4[i];
+        a.palaces.forEach(function(p){
+          (p.majorStars||[]).forEach(function(s){ if(s.name===star) lnActs[t].push(star+"→"+p.name); });
+        });
+      });
+    }
     sorted.forEach(function(p){
       var sf=SF.indexOf(p.name)>=0;
-      var zg=el("div","zg"+(p.isOriginalPalace?" ming":"")+(p.isBodyPalace?" body":"")+(sf?" sanfang":""));
+      var isLnMing=lnMing&&p===lnMing, isLnSF=lnSF.has(p.name);
+      var zcls="zg"+(p.isOriginalPalace?" ming":"")+(p.isBodyPalace?" body":"")+(sf?" sanfang":"");
+      if(isLnMing)zcls+=" ln lnming"; else if(isLnSF)zcls+=" ln";
+      var zg=el("div",zcls);
       zg.dataset.name=p.name;
       var nm=el("div","gname",p.name);
       if(p.isOriginalPalace)nm.appendChild(el("span","badge","命"));
       if(p.isBodyPalace)nm.appendChild(el("span","badge body","身"));
       if(sf)nm.appendChild(el("span","badge sf","三方"));
+      if(isLnMing)nm.appendChild(el("span","badge lnming","流年命"));
+      else if(isLnSF)nm.appendChild(el("span","badge ln","流年"));
       zg.appendChild(nm);
       zg.appendChild(el("div","gz",p.heavenlyStem+p.earthlyBranch));
       var st=el("div","stars");
@@ -268,6 +316,35 @@
     cd.appendChild(seq);
     cd.appendChild(el("div","note","大限依命宫天干阴阳、男女顺逆排布，每限十年。高亮为当前年龄所处大限（依 iztro 大限岁序推算，供参考）。"));
     box.appendChild(cd);
+
+    // 4) 流年
+    var cl=el("div","card ln-card");
+    cl.appendChild(el("h3",null,"流年 · "+lnYear+"（"+lnGan+lnZhi+"年）"+(lnMing?("　流年命宫："+lnMing.name+" "+lnMing.heavenlyStem+lnMing.earthlyBranch):"")));
+    if(lnMing){
+      var gp=el("div","gp");
+      var lnSet=new Set(lnSF); lnSet.add(lnMing.name);
+      lnSet.forEach(function(nm2){
+        var pp=sorted.filter(function(x){return x.name===nm2;})[0];
+        var g=el("div","g");
+        g.appendChild(el("div","nm",(pp===lnMing?"流年命宫 · ":"流年 · ")+pp.name));
+        var sts=(pp.majorStars||[]).map(function(s){return s.name;}).join("、")||"—";
+        g.appendChild(el("div","st",sts));
+        gp.appendChild(g);
+      });
+      cl.appendChild(gp);
+    }
+    var sg2=el("div","sx-grid");
+    ["禄","权","科","忌"].forEach(function(t){
+      var sx=el("div","sx "+t);
+      sx.appendChild(el("div","t",t));
+      var arr=lnActs[t];
+      sx.appendChild(el("div","star",arr[0]?arr[0].split("→")[0]:"—"));
+      sx.appendChild(el("div","to",arr[0]?arr[0].split("→")[1]+"宫":"—"));
+      sg2.appendChild(sx);
+    });
+    cl.appendChild(sg2);
+    cl.appendChild(el("div","note","流年命宫 = 当年太岁（"+lnGan+lnZhi+"）所落之宫；其三方四正（财帛·官禄·迁移）为当年重点宫位。流年四化依流年天干（"+lnGan+"干）推导，与本命四化叠加参看，吉凶以实际星曜庙旺落陷为断。"));
+    box.appendChild(cl);
     box.scrollIntoView({behavior:"smooth",block:"start"});
   }
 })();
