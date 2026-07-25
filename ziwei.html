@@ -21,7 +21,7 @@
   /* 十二宫盘 */
   .zwheel{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
   .zg{background:var(--panel);border:1px solid color-mix(in srgb,var(--purple) 28%,transparent);
-    border-radius:12px;padding:11px 10px;min-height:104px;position:relative;transition:.18s}
+    border-radius:12px;padding:11px 10px;min-height:104px;position:relative;z-index:3;transition:.18s}
   .zg:hover{border-color:var(--purple);box-shadow:0 0 16px rgba(168,144,255,.22)}
   .zg.ming{background:linear-gradient(180deg,rgba(255,214,110,.14),var(--panel));border-color:var(--gold)}
   .zg.body{border-color:color-mix(in srgb,var(--cyan) 60%,transparent)}
@@ -40,6 +40,12 @@
   .mut.权{color:#0a0e2a;background:var(--rose)}
   .mut.科{color:#0a0e2a;background:var(--cyan)}
   .mut.忌{color:#0a0e2a;background:#9a93b0}
+  /* 三方四正连线 */
+  .zwheel-wrap{position:relative}
+  .sf-lines{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;z-index:1}
+  .sf-lines line{stroke:var(--cyan);stroke-width:1.5;opacity:.55;stroke-linecap:round;
+    filter:drop-shadow(0 0 4px rgba(110,224,214,.6))}
+  .zwheel-cap{font-size:11.5px;color:var(--cyan);opacity:.8;margin-top:10px;letter-spacing:.5px}
   /* 四化 */
   .sx-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
   .sx{background:var(--panel);border:1px solid color-mix(in srgb,var(--purple) 26%,transparent);border-radius:12px;padding:14px 12px;text-align:center}
@@ -144,6 +150,27 @@
     sz();dr();var t;addEventListener('resize',function(){clearTimeout(t);t=setTimeout(function(){sz();dr();},180);});
   })();
 
+  // 三方四正 SVG 连线
+  function buildSanFangSvg(){var s=document.createElementNS('http://www.w3.org/2000/svg','svg');s.setAttribute('class','sf-lines');return s;}
+  function drawSanFang(){
+    var wrap=document.querySelector('.zwheel-wrap'); if(!wrap) return;
+    var svg=wrap.querySelector('.sf-lines'); if(!svg) return;
+    while(svg.firstChild) svg.removeChild(svg.firstChild);
+    var nodes=wrap.querySelectorAll('.zg.sanfang'); if(nodes.length<2) return;
+    var wr=wrap.getBoundingClientRect();
+    svg.setAttribute('viewBox','0 0 '+wr.width+' '+wr.height);
+    svg.setAttribute('width',wr.width); svg.setAttribute('height',wr.height);
+    function ctr(n){var r=n.getBoundingClientRect();return {x:r.left-wr.left+r.width/2,y:r.top-wr.top+r.height/2};}
+    var C={}; nodes.forEach(function(n){C[n.dataset.name]=ctr(n);});
+    function ln(a,b){if(!a||!b)return;var l=document.createElementNS('http://www.w3.org/2000/svg','line');
+      l.setAttribute('x1',a.x.toFixed(1));l.setAttribute('y1',a.y.toFixed(1));
+      l.setAttribute('x2',b.x.toFixed(1));l.setAttribute('y2',b.y.toFixed(1));svg.appendChild(l);}
+    if(C['命宫']&&C['财帛']) ln(C['命宫'],C['财帛']);
+    if(C['财帛']&&C['官禄']) ln(C['财帛'],C['官禄']);
+    if(C['财帛']&&C['迁移']) ln(C['财帛'],C['迁移']);
+  }
+  var _sfT; addEventListener('resize',function(){clearTimeout(_sfT);_sfT=setTimeout(drawSanFang,160);});
+
   $("#btn-ziwei").addEventListener("click",function(){
     var err=$("#err-ziwei");err.style.display="none";err.textContent="";
     try{
@@ -175,6 +202,7 @@
 
     // 1) 十二宫盘（斗数正统序：命宫→兄弟→…→父母）
     var cg=el("div","card"); cg.appendChild(el("h3",null,"十二宫盘 "+(ming?("命宫 "+ming.name+" "+mz+"　主星："+mstars):"")));
+    var gridWrap=el("div","zwheel-wrap");
     var grid=el("div","zwheel");
     var ZW_ORDER=['命宫','兄弟','夫妻','子女','财帛','疾厄','迁移','仆役','官禄','田宅','福德','父母'];
     var SF=['命宫','财帛','官禄','迁移']; // 命宫三方四正
@@ -182,6 +210,7 @@
     sorted.forEach(function(p){
       var sf=SF.indexOf(p.name)>=0;
       var zg=el("div","zg"+(p.isOriginalPalace?" ming":"")+(p.isBodyPalace?" body":"")+(sf?" sanfang":""));
+      zg.dataset.name=p.name;
       var nm=el("div","gname",p.name);
       if(p.isOriginalPalace)nm.appendChild(el("span","badge","命"));
       if(p.isBodyPalace)nm.appendChild(el("span","badge body","身"));
@@ -198,8 +227,12 @@
       zg.appendChild(st);
       grid.appendChild(zg);
     });
-    cg.appendChild(grid);
+    gridWrap.appendChild(grid);
+    gridWrap.appendChild(buildSanFangSvg());
+    cg.appendChild(gridWrap);
+    cg.appendChild(el("div","zwheel-cap","◇ 三方四正连线：命宫 · 财帛 · 官禄 · 迁移 — 命主格局之核心四宫"));
     box.appendChild(cg);
+    drawSanFang();
 
     // 2) 四化
     var cs=el("div","card"); cs.appendChild(el("h3",null,"四化 · 禄权科忌"));

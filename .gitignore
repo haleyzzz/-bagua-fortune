@@ -1,3 +1,6 @@
 .DS_Store
 Thumbs.db
 *.log
+
+# 工程内误写入的 agent 内存目录（非站点资源）
+.workbuddy/
