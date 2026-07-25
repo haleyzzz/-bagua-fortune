@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>河洛理数 · Heluo Lishu</title>
+<style>
+  :root{
+    --bg:#f3eee2; --paper:#faf6e8; --ink:#1a1a1a; --water:#6890a8;
+    --line:#b8b0a0; --accent:#5a7d8c; --soft:#8a8170;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:var(--bg); color:var(--ink);
+    font-family:"STKaiti","KaiTi","Kaiti SC",STSong,serif;
+    line-height:1.7; -webkit-font-smoothing:antialiased;
+  }
+  .wrap{max-width:920px;margin:0 auto;padding:32px 20px 64px;}
+  header.hero{text-align:center;padding:18px 0 8px;border-bottom:1px solid var(--line);margin-bottom:24px;}
+  header.hero h1{font-size:34px;letter-spacing:.18em;margin:0;font-weight:600;}
+  header.hero .en{font-family:"Cinzel",Georgia,serif;letter-spacing:.32em;color:var(--soft);font-size:13px;margin-top:6px;}
+  header.hero .sub{color:var(--soft);font-size:14px;margin-top:10px;}
+
+  .card{background:var(--paper);border:1px solid var(--line);border-radius:10px;padding:20px 22px;margin:18px 0;box-shadow:0 1px 0 rgba(0,0,0,.03);}
+  .card h2{font-size:18px;letter-spacing:.1em;margin:0 0 14px;border-left:3px solid var(--water);padding-left:10px;}
+
+  /* 表单 */
+  .form-row{display:flex;flex-wrap:wrap;gap:12px;align-items:flex-end;}
+  .field{display:flex;flex-direction:column;gap:4px;}
+  .field label{font-size:13px;color:var(--soft);}
+  .field input,.field select{
+    font-family:inherit;font-size:15px;padding:7px 10px;border:1px solid var(--line);
+    border-radius:6px;background:#fff;color:var(--ink);min-width:84px;
+  }
+  .btn{
+    font-family:inherit;font-size:15px;letter-spacing:.12em;cursor:pointer;
+    padding:9px 22px;border:none;border-radius:6px;color:#fff;background:var(--water);
+    transition:opacity .15s;
+  }
+  .btn:hover{opacity:.88;}
+
+  /* 四柱 */
+  .pillars{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;}
+  .pillar{flex:1;min-width:120px;text-align:center;background:#fff;border:1px solid var(--line);border-radius:8px;padding:12px 6px;}
+  .pillar .lab{font-size:12px;color:var(--soft);letter-spacing:.2em;}
+  .pillar .gz{font-size:28px;margin-top:4px;letter-spacing:.06em;}
+  .pillar .meta{font-size:12px;color:var(--soft);margin-top:2px;}
+
+  /* 太极 + 数表 */
+  .duo{display:flex;gap:24px;flex-wrap:wrap;align-items:center;}
+  .taiji{width:140px;height:140px;flex:0 0 auto;}
+  .numtbl{flex:1;min-width:260px;}
+  table.nums{width:100%;border-collapse:collapse;font-size:14px;}
+  table.nums th,table.nums td{border:1px solid var(--line);padding:7px 8px;text-align:center;}
+  table.nums th{background:#efe9db;color:var(--soft);font-weight:600;letter-spacing:.05em;}
+  .tag{display:inline-block;background:#efe9db;border:1px solid var(--line);border-radius:20px;padding:2px 12px;font-size:13px;color:var(--accent);}
+
+  /* 卦盘 */
+  .guas{display:flex;gap:40px;flex-wrap:wrap;justify-content:center;align-items:flex-start;margin-top:6px;}
+  .gua{text-align:center;}
+  .gua .gt{font-size:22px;letter-spacing:.08em;margin-bottom:10px;}
+  .gua .gt small{display:block;font-size:12px;color:var(--soft);letter-spacing:.1em;margin-top:2px;}
+  .yao{display:flex;flex-direction:column-reverse;gap:6px;align-items:center;}
+  .line{height:10px;border-radius:2px;background:var(--ink);}
+  .line.yang{width:90px;}
+  .line.yin{width:90px;background:transparent;position:relative;}
+  .line.vin{background:transparent;}
+  .line.vin::before,.line.vin::after{content:"";position:absolute;top:0;height:10px;width:38px;background:var(--ink);border-radius:2px;}
+  .line.vin::before{left:0;}
+  .line.vin::after{right:0;}
+  .line.dong{box-shadow:0 0 0 2px var(--water);}
+  .yao-idx{font-size:11px;color:var(--soft);margin-top:2px;}
+
+  .wx{display:flex;gap:14px;flex-wrap:wrap;justify-content:center;margin-top:6px;}
+  .wx .chip{background:#fff;border:1px solid var(--line);border-radius:8px;padding:10px 16px;text-align:center;min-width:96px;}
+  .wx .chip .k{font-size:12px;color:var(--soft);}
+  .wx .chip .v{font-size:20px;margin-top:2px;}
+  .relation{text-align:center;color:var(--soft);font-size:14px;margin-top:10px;}
+
+  .shaozi{background:#fff;border-left:3px solid var(--accent);padding:14px 16px;border-radius:6px;font-size:16px;color:#333;line-height:2;}
+
+  .disclaimer{margin-top:26px;border:1px dashed #c98b8b;background:#fbf3f0;color:#9a5a55;border-radius:8px;padding:12px 16px;font-size:13px;line-height:1.8;}
+
+  @media (max-width:720px){
+    header.hero h1{font-size:26px;}
+    .pillar .gz{font-size:22px;}
+    .form-row{gap:8px;}
+    .field input,.field select{min-width:70px;}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="hero">
+    <h1>河洛理数</h1>
+    <div class="en">HELUO LISHU</div>
+    <div class="sub">先天为体 · 后天为用 · 数中有理，理中有数</div>
+  </header>
+
+  <section class="card">
+    <h2>起卦 · 填出生时间</h2>
+    <div class="form-row">
+      <div class="field"><label>公历年</label><input id="y" type="number" value="1987" min="1901" max="2099" /></div>
+      <div class="field"><label>月</label><input id="m" type="number" value="10" min="1" max="12" /></div>
+      <div class="field"><label>日</label><input id="d" type="number" value="16" min="1" max="31" /></div>
+      <div class="field"><label>时辰</label>
+        <select id="hour">
+          <option value="0">子时 23–1</option>
+          <option value="2">丑时 1–3</option>
+          <option value="4">寅时 3–5</option>
+          <option value="6">卯时 5–7</option>
+          <option value="8">辰时 7–9</option>
+          <option value="10">巳时 9–11</option>
+          <option value="12" selected>午时 11–13</option>
+          <option value="14">未时 13–15</option>
+          <option value="16">申时 15–17</option>
+          <option value="18">酉时 17–19</option>
+          <option value="20">戌时 19–21</option>
+          <option value="22">亥时 21–23</option>
+        </select>
+      </div>
+      <button class="btn" id="go">起卦</button>
+    </div>
+  </section>
+
+  <div id="result" style="display:none;">
+    <section class="card">
+      <h2>四柱干支</h2>
+      <div class="pillars" id="pillars"></div>
+    </section>
+
+    <section class="card">
+      <h2>先天数 · 后天数</h2>
+      <div class="duo">
+        <svg class="taiji" viewBox="0 0 100 100" aria-label="太极图">
+          <circle cx="50" cy="50" r="46" fill="#1a1a1a"/>
+          <path d="M50 4 A23 23 0 0 1 50 50 A23 23 0 0 0 50 96 A46 46 0 0 1 50 4 Z" fill="#faf6e8"/>
+          <circle cx="50" cy="27" r="6" fill="#1a1a1a"/>
+          <circle cx="50" cy="73" r="6" fill="#faf6e8"/>
+        </svg>
+        <div class="numtbl">
+          <table class="nums">
+            <thead><tr><th></th><th>年</th><th>月</th><th>日</th><th>时</th></tr></thead>
+            <tbody>
+              <tr><td>天干序</td><td id="n_g"></td><td id="n_m"></td><td id="n_d"></td><td id="n_h"></td></tr>
+              <tr><td>地支序</td><td id="z_g"></td><td id="z_m"></td><td id="z_d"></td><td id="z_h"></td></tr>
+              <tr><td>先天卦</td><td colspan="2" id="up_x"></td><td colspan="2" id="low_x"></td></tr>
+              <tr><td>洛书数</td><td colspan="2" id="up_l"></td><td colspan="2" id="low_l"></td></tr>
+            </tbody>
+          </table>
+          <div style="text-align:center;margin-top:10px;">
+            <span class="tag" id="dong_tag"></span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="card">
+      <h2>本命卦 · 变卦（体用双立）</h2>
+      <div class="guas">
+        <div class="gua">
+          <div class="gt" id="ben_name"></div>
+          <div class="yao" id="ben_yao"></div>
+        </div>
+        <div class="gua">
+          <div class="gt" id="bian_name"></div>
+          <div class="yao" id="bian_yao"></div>
+        </div>
+      </div>
+      <div class="wx" id="wx"></div>
+      <div class="relation" id="rel"></div>
+    </section>
+
+    <section class="card">
+      <h2>邵子心法</h2>
+      <div class="shaozi" id="shaozi"></div>
+    </section>
+  </div>
+
+  <div class="disclaimer">
+    ⚠️ 本页为传统「先天数 / 后天数」数理框架的<b>演示性推演</b>，非考据定命，亦不构成任何决策建议。
+    干支取自已用权威农历库校验的引擎；起卦采用通行先天八卦数法。命理是参考，不是定数。
+  </div>
+</div>
+
+<script src="js-engine/src/lunar.js"></script>
+<script src="js-engine/src/heluo.js"></script>
+<script>
+  function yaoHTML(yao6, dong) {
+    // yao6: 自下而上 1阳0阴; 渲染时从上(5)到下(0)
+    var html = '';
+    for (var i = 5; i >= 0; i--) {
+      var v = yao6[i];
+      var cls = v ? 'line yang' : 'line vin';
+      var isDong = (i === (dong - 1));
+      if (isDong) cls += ' dong';
+      var idx = i + 1; // 1底..6顶
+      html += '<div style="text-align:center;"><div class="' + cls + '"></div>'
+            + '<div class="yao-idx">' + (isDong ? '● ' : '') + '第' + idx + '爻</div></div>';
+    }
+    return html;
+  }
+  function render(q) {
+    document.getElementById('result').style.display = 'block';
+    var g = q.ganzhi, x = q.xiantian, l = q.luoshu, gua = q.gua;
+    // 四柱
+    var pillars = [
+      {lab:'年柱', gz:g.year, meta:q.meta.lunar.yearCN || ''},
+      {lab:'月柱', gz:g.month, meta:''},
+      {lab:'日柱', gz:g.day, meta:''},
+      {lab:'时柱', gz:g.hour, meta:''}
+    ];
+    document.getElementById('pillars').innerHTML = pillars.map(function(p){
+      return '<div class="pillar"><div class="lab">'+p.lab+'</div><div class="gz">'+p.gz+'</div><div class="meta">'+p.meta+'</div></div>';
+    }).join('');
+    // 数表
+    document.getElementById('n_g').textContent = x.year.gan;
+    document.getElementById('n_m').textContent = x.month.gan;
+    document.getElementById('n_d').textContent = x.day.gan;
+    document.getElementById('n_h').textContent = x.hour.gan;
+    document.getElementById('z_g').textContent = x.year.zhi;
+    document.getElementById('z_m').textContent = x.month.zhi;
+    document.getElementById('z_d').textContent = x.day.zhi;
+    document.getElementById('z_h').textContent = x.hour.zhi;
+    document.getElementById('up_x').textContent = x.upGua + '（先天' + x.up + '）';
+    document.getElementById('low_x').textContent = x.lowGua + '（先天' + x.low + '）';
+    document.getElementById('up_l').textContent = x.upGua + '（洛书' + l.up + '）';
+    document.getElementById('low_l').textContent = x.lowGua + '（洛书' + l.low + '）';
+    document.getElementById('dong_tag').textContent = '动爻：第 ' + x.dong + ' 爻';
+    // 卦盘
+    document.getElementById('ben_name').innerHTML = '本命卦 · ' + gua.ben + '<small>上' + gua.benUpper + ' 下' + gua.benLower + '</small>';
+    document.getElementById('ben_yao').innerHTML = yaoHTML(gua.yao, gua.dong);
+    document.getElementById('bian_name').innerHTML = '变卦 · ' + gua.bian + '<small>上' + gua.bianUpper + ' 下' + gua.bianLower + '</small>';
+    document.getElementById('bian_yao').innerHTML = yaoHTML(gua.yaoChanged, gua.dong);
+    // 五行
+    document.getElementById('wx').innerHTML =
+      '<div class="chip"><div class="k">体卦</div><div class="v">'+gua.ti+gua.tiWX+'</div></div>'
+    + '<div class="chip"><div class="k">用卦</div><div class="v">'+gua.yong+gua.yongWX+'</div></div>'
+    + '<div class="chip"><div class="k">元气</div><div class="v">'+gua.yuanqi+'</div></div>';
+    var sheng = (HELUO.WX_SHENG[gua.tiWX] === gua.yongWX);
+    var ke = (HELUO.WX_KE[gua.tiWX] === gua.yongWX);
+    var rel = '体（'+gua.tiWX+'）与用（'+gua.yongWX+'）';
+    if (sheng) rel += '：体生用，泄气而能施。';
+    else if (ke) rel += '：体克用，劳力而有成。';
+    else if (HELUO.WX_SHENG[gua.yongWX] === gua.tiWX) rel += '：用生体，得助而丰。';
+    else if (HELUO.WX_KE[gua.yongWX] === gua.tiWX) rel += '：用克体，受制须守。';
+    else rel += '：比和，同心同气。';
+    document.getElementById('rel').textContent = rel;
+    // 邵子
+    document.getElementById('shaozi').textContent = q.shaozi;
+    document.getElementById('result').scrollIntoView({behavior:'smooth'});
+  }
+  document.getElementById('go').addEventListener('click', function () {
+    var y = +document.getElementById('y').value;
+    var m = +document.getElementById('m').value;
+    var d = +document.getElementById('d').value;
+    var hour = +document.getElementById('hour').value;
+    if (!y || !m || !d) return;
+    try {
+      render(HELUO.query(y, m, d, hour));
+    } catch (e) {
+      alert('该日期超出本引擎支持的 1901–2099 范围（公历年初/年末可能对应相邻农历年），请调整。');
+    }
+  });
+  // 默认渲染一次
+  try { render(HELUO.query(1987, 10, 16, 12)); }
+  catch (e) { console.warn('默认渲染失败', e); }
+</script>
+</body>
+</html>
