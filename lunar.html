@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>农历黄历 · 米黄古籍</title>
+<style>
+  :root{
+    --bg:#f3ead2; --paper:#fbf4dc; --ink:#2a2418; --ink-soft:#6b5d44;
+    --vermilion:#a83018; --bronze:#8a6824; --jade:#3f7a5e;
+    --line:#d8c79f; --gold:#b08a3a;
+    --accent:#a83018;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);
+    font-family:"STKaiti","KaiTi","Songti SC","SimSun",serif;
+    background-image:radial-gradient(circle at 20% 10%,rgba(176,138,58,.08),transparent 40%),
+      radial-gradient(circle at 80% 90%,rgba(168,48,24,.06),transparent 45%);
+    min-height:100vh}
+  .topnav{display:flex;flex-wrap:wrap;align-items:center;gap:4px 14px;padding:14px 22px;
+    background:linear-gradient(180deg,#efe2c2,#e7d6b0);border-bottom:2px solid var(--bronze);
+    position:sticky;top:0;z-index:20}
+  .topnav .brand{font-size:19px;font-weight:700;color:var(--vermilion);letter-spacing:2px;
+    text-decoration:none;margin-right:8px;text-shadow:0 1px 0 #fff8}
+  .topnav .brand small{display:block;font-size:9px;letter-spacing:3px;color:var(--ink-soft);font-weight:400}
+  .topnav a{color:var(--ink);text-decoration:none;font-size:14px;letter-spacing:1px;padding:4px 6px;border-radius:6px}
+  .topnav a:hover{background:rgba(138,104,36,.14)}
+  .topnav a.active{color:#fff;background:var(--vermilion);font-weight:700}
+  .wrap{max-width:880px;margin:0 auto;padding:26px 18px 40px}
+  .page-head{text-align:center;margin-bottom:22px}
+  .page-head h1{font-size:30px;margin:0 0 6px;letter-spacing:4px;color:var(--vermilion)}
+  .page-head .en{font-size:12px;letter-spacing:3px;color:var(--ink-soft);opacity:.8}
+  .page-head .sub{font-size:13px;color:var(--ink-soft);margin-top:6px}
+  .card{background:var(--paper);border:1px solid var(--line);border-radius:12px;
+    padding:18px 18px;margin-bottom:18px;box-shadow:0 2px 10px rgba(80,60,20,.08);
+    position:relative}
+  .card::before{content:"";position:absolute;inset:5px;border:1px solid rgba(138,104,36,.28);border-radius:8px;pointer-events:none}
+  .card h3{margin:0 0 14px;font-size:17px;letter-spacing:2px;color:var(--bronze);
+    border-bottom:1px dashed var(--line);padding-bottom:9px;display:flex;align-items:center;gap:8px}
+  .badge{font-size:11px;background:rgba(168,48,24,.12);color:var(--vermilion);
+    border:1px solid rgba(168,48,24,.3);padding:1px 9px;border-radius:12px;letter-spacing:1px}
+  label{font-size:13px;color:var(--ink-soft);letter-spacing:1px}
+  input,select{font-family:inherit;font-size:14px;padding:7px 9px;border:1px solid var(--line);
+    border-radius:7px;background:#fffdf6;color:var(--ink);margin-top:5px}
+  .row{display:flex;gap:14px;flex-wrap:wrap;align-items:flex-end}
+  .row>.col{flex:1;min-width:120px}
+  .btn{margin-top:14px;font-family:inherit;font-size:15px;letter-spacing:3px;cursor:pointer;
+    background:var(--vermilion);color:#fff;border:none;padding:10px 26px;border-radius:8px;
+    box-shadow:0 2px 8px rgba(168,48,24,.3)}
+  .btn:hover{filter:brightness(1.06)}
+  .err{color:var(--vermilion);background:rgba(168,48,24,.1);border:1px solid rgba(168,48,24,.35);
+    border-radius:8px;padding:11px;font-size:14px;margin-top:14px;display:none}
+  /* 主盘面 */
+  .almanac{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+  .big-date{text-align:center;padding:10px 6px;border-right:1px solid var(--line)}
+  .big-date .solar{font-size:26px;letter-spacing:2px;color:var(--ink)}
+  .big-date .week{font-size:13px;color:var(--ink-soft);margin-top:3px}
+  .big-date .lunar{font-size:21px;color:var(--vermilion);margin-top:8px;letter-spacing:2px}
+  .big-date .fest{display:inline-block;margin-top:7px;font-size:12px;background:var(--bronze);
+    color:#fbf4dc;padding:1px 11px;border-radius:12px;letter-spacing:2px}
+  .meta-col{display:flex;flex-direction:column;justify-content:center;gap:8px;padding-left:6px}
+  .meta-row{display:flex;justify-content:space-between;font-size:14px;border-bottom:1px dotted var(--line);padding:3px 0}
+  .meta-row .k{color:var(--ink-soft);letter-spacing:1px}
+  .meta-row .v{color:var(--ink);font-weight:600}
+  .meta-row .v.gz{color:var(--vermilion)}
+  /* 节气 */
+  .term-box{display:flex;align-items:center;gap:14px;margin-top:4px;flex-wrap:wrap}
+  .term-today{font-size:16px;color:var(--vermilion);font-weight:700;letter-spacing:2px;
+    background:rgba(168,48,24,.1);border:1px solid rgba(168,48,24,.3);padding:4px 14px;border-radius:8px}
+  .term-next{font-size:14px;color:var(--ink)}
+  .term-next b{color:var(--jade);font-size:16px}
+  .term-count{font-size:13px;color:var(--ink-soft)}
+  /* 宜忌 */
+  .yiji{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:4px}
+  .yi,.ji{background:#fffdf6;border:1px solid var(--line);border-radius:9px;padding:13px}
+  .yi h4,.ji h4{margin:0 0 9px;font-size:15px;letter-spacing:3px}
+  .yi h4{color:var(--jade)} .ji h4{color:var(--vermilion)}
+  .tags{display:flex;flex-wrap:wrap;gap:6px}
+  .tag{font-size:13px;padding:2px 10px;border-radius:11px;background:rgba(63,122,94,.1);color:#2f5a44;border:1px solid rgba(63,122,94,.3)}
+  .ji .tag{background:rgba(168,48,24,.08);color:var(--vermilion);border-color:rgba(168,48,24,.28)}
+  .officer{font-size:13px;color:var(--ink-soft);margin-bottom:8px}
+  .officer b{color:var(--bronze);font-size:15px;letter-spacing:2px}
+  /* 节气表 */
+  .term-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:8px;margin-top:4px}
+  .term-cell{background:#fffdf6;border:1px solid var(--line);border-radius:8px;padding:8px 10px;font-size:13px;
+    display:flex;justify-content:space-between;align-items:center}
+  .term-cell .tn{color:var(--ink)}
+  .term-cell .td{color:var(--vermilion);font-weight:600}
+  .term-cell.hl{background:rgba(168,48,24,.1);border-color:rgba(168,48,24,.35)}
+  .note{font-size:12px;color:var(--ink-soft);line-height:1.7;margin-top:10px;opacity:.85}
+  .footer{max-width:880px;margin:0 auto;padding:0 18px 40px}
+  .disclaimer{border:1px dashed var(--vermilion);color:var(--vermilion);background:rgba(168,48,24,.05);
+    border-radius:8px;padding:12px 14px;font-size:12px;line-height:1.7}
+  @media(max-width:680px){ .almanac{grid-template-columns:1fr} .big-date{border-right:none;border-bottom:1px solid var(--line)}
+    .yiji{grid-template-columns:1fr} .topnav{gap:3px 9px;padding:11px 12px} }
+</style>
+</head>
+<body data-page="lunar">
+<nav class="topnav">
+  <a class="brand" href="index.html">八卦运势<small>Ba Gua Fortune</small></a>
+  <a href="bazi.html">八字</a>
+  <a href="ziwei.html">紫微</a>
+  <a href="meihua.html">梅花</a>
+  <a href="liuyao.html">六爻</a>
+  <a href="tarot.html">塔罗</a>
+  <a href="fengshui.html">风水</a>
+  <a href="hehun.html">合婚</a>
+  <a href="lunar.html" class="active">黄历</a>
+</nav>
+
+<div class="wrap">
+  <div class="page-head">
+    <h1>农历黄历</h1>
+    <div class="en">LUNAR ALMANAC · 农历 · 节气 · 宜忌</div>
+    <div class="sub">公历↔农历 · 二十四节气 · 建除十二神 · 年命纳音 · 1901–2100</div>
+  </div>
+
+  <div class="card">
+    <h3>查日子 <span class="badge">选公历日期</span></h3>
+    <div class="row">
+      <div class="col"><label>公历日期</label><input id="dt" type="date"></div>
+      <div class="col" style="flex:0 0 150px"><label>时辰</label>
+        <select id="hour">
+          <option value="23">子时 (23–1)</option>
+          <option value="1">丑时 (1–3)</option>
+          <option value="3">寅时 (3–5)</option>
+          <option value="5">卯时 (5–7)</option>
+          <option value="7">辰时 (7–9)</option>
+          <option value="9">巳时 (9–11)</option>
+          <option value="11" selected>午时 (11–13)</option>
+          <option value="13">未时 (13–15)</option>
+          <option value="15">申时 (15–17)</option>
+          <option value="17">酉时 (17–19)</option>
+          <option value="19">戌时 (19–21)</option>
+          <option value="21">亥时 (21–23)</option>
+        </select>
+      </div>
+    </div>
+    <button class="btn" id="btn-q">查 询</button>
+    <div class="err" id="err"></div>
+  </div>
+
+  <div id="lunar-result"></div>
+</div>
+
+<footer class="footer">
+  <div class="disclaimer">⚠️ 以上为传统历法与黄历文化的整理呈现，仅供参考。本页由 AI 生成，不构成医疗、法律、财务或决策建议；历法数据基于香港天文台 1901–2100 节气表与农历编码，命理是参考，不是定数。涉及婚嫁、动土、搬迁等重大事宜请结合现实与专业人士意见。</div>
+</footer>
+
+<script src="js-engine/src/lunar.js"></script>
+<script>
+(function(){
+  "use strict";
+  function $(s){return document.querySelector(s);}
+  function el(t,c,h){var e=document.createElement(t);if(c)e.className=c;if(h!=null)e.innerHTML=h;return e;}
+  var SHICHEN = {23:"子时",1:"丑时",3:"寅时",5:"卯时",7:"辰时",9:"巳时",11:"午时",13:"未时",15:"申时",17:"酉时",19:"戌时",21:"亥时"};
+
+  function todayStr(){
+    var d=new Date();
+    var p=function(n){return (n<10?"0":"")+n;};
+    return d.getFullYear()+"-"+p(d.getMonth()+1)+"-"+p(d.getDate());
+  }
+  $("#dt").value = todayStr();
+
+  $("#btn-q").addEventListener("click",function(){
+    var err=$("#err"); err.style.display="none"; err.textContent="";
+    try{
+      var v=$("#dt").value;
+      if(!v) throw new Error("请选择公历日期");
+      var p=v.split("-"); var y=+p[0],m=+p[1],d=+p[2];
+      var hour=+$("#hour").value;
+      var q=LUNAR.query(y,m,d,hour);
+      render(q);
+    }catch(e){ err.style.display="block"; err.textContent="⚠ "+e.message; }
+  });
+
+  function render(q){
+    var box=$("#lunar-result"); box.innerHTML="";
+    // 主盘面
+    var c=el("div","card");
+    c.appendChild(el("h3",null,"黄历 · "+q.solar.year+"年"+q.solar.month+"月"+q.solar.day+"日 <span class='badge'>"+q.lunar.yearCN+"年</span>"));
+    var al=el("div","almanac");
+    var bd=el("div","big-date");
+    bd.appendChild(el("div","solar",q.solar.year+"年"+q.solar.month+"月"+q.solar.day+"日"));
+    bd.appendChild(el("div","week",q.solar.week));
+    bd.appendChild(el("div","lunar",q.lunar.monthCN+(q.lunar.monthLong?"大":"小")+" · "+q.lunar.dayCN));
+    if(q.festival) bd.appendChild(el("div","fest",q.festival));
+    al.appendChild(bd);
+    var mc=el("div","meta-col");
+    function mr(k,v,cls){ var r=el("div","meta-row"); r.appendChild(el("span","k",k)); r.appendChild(el("span","v"+(cls?" "+cls:""),v)); return r; }
+    mc.appendChild(mr("生肖",q.zodiac));
+    mc.appendChild(mr("年命纳音",q.nayin));
+    mc.appendChild(mr("日柱纳音",q.dayNayin));
+    mc.appendChild(mr("星座",q.star));
+    mc.appendChild(mr("年干支",q.ganzhi.year8,"gz"));
+    mc.appendChild(mr("月干支",q.ganzhi.month8,"gz"));
+    mc.appendChild(mr("日干支",q.ganzhi.day8,"gz"));
+    al.appendChild(mc);
+    c.appendChild(al);
+    box.appendChild(c);
+
+    // 节气
+    var ct=el("div","card");
+    ct.appendChild(el("h3",null,"二十四节气 <span class='badge'>"+q.solar.year+"年</span>"));
+    var tb=el("div","term-box");
+    if(q.solarTerm.today){
+      tb.appendChild(el("div","term-today","今日 · "+q.solarTerm.today));
+    } else {
+      tb.appendChild(el("div","term-next","下一节气 <b>"+q.solarTerm.next+"</b> ("+q.solarTerm.nextDate.month+"月"+q.solarTerm.nextDate.day+"日)"));
+      tb.appendChild(el("div","term-count","距今约 "+q.solarTerm.daysTo+" 天"));
+    }
+    ct.appendChild(tb);
+    // 当年节气表
+    var terms=LUNAR.getSolarTerms(q.solar.year);
+    var grid=el("div","term-grid");
+    terms.forEach(function(t){
+      var cell=el("div","term-cell"+(t.name===q.solarTerm.today?" hl":""));
+      cell.appendChild(el("span","tn",t.name));
+      cell.appendChild(el("span","td",t.month+"/"+t.day));
+      grid.appendChild(cell);
+    });
+    ct.appendChild(grid);
+    box.appendChild(ct);
+
+    // 宜忌
+    var cy=el("div","card");
+    cy.appendChild(el("h3",null,"今日宜忌 <span class='badge'>建除 · "+q.fortune.officer+"</span>"));
+    var o=el("div","officer","本日建除十二神为 <b>"+q.fortune.officer+"</b> 日");
+    cy.appendChild(o);
+    var yj=el("div","yiji");
+    var yi=el("div","yi"); yi.appendChild(el("h4",null,"宜"));
+    var yt=el("div","tags"); (q.fortune.yi.length?q.fortune.yi:["（诸事平）"]).forEach(function(x){yt.appendChild(el("span","tag",x));}); yi.appendChild(yt);
+    var ji=el("div","ji"); ji.appendChild(el("h4",null,"忌"));
+    var jt=el("div","tags"); (q.fortune.ji.length?q.fortune.ji:["（无事忌）"]).forEach(function(x){jt.appendChild(el("span","tag",x));}); ji.appendChild(jt);
+    yj.appendChild(yi); yj.appendChild(ji);
+    cy.appendChild(yj);
+    cy.appendChild(el("div","note","宜忌以建除十二神（"+q.fortune.officer+"）为主轴，并参日干支之忌。传统黄历重「因时择事」，所列仅为文化惯例，非绝对禁忌；具体安排仍请结合现实情况。"));
+    box.appendChild(cy);
+
+    box.scrollIntoView({behavior:"smooth",block:"start"});
+  }
+})();
+</script>
+</body>
+</html>
