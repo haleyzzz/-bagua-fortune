@@ -142,7 +142,8 @@
     font-size:11px;
     font-weight:300;
     letter-spacing:.45em;
-    color:rgba(255,26,26,.6);
+    color:var(--accent, var(--red));
+    opacity:.72;
     margin-bottom:14px;
   }
   .screen-title{
@@ -156,7 +157,7 @@
     display:block;
     width:50px;
     height:1px;
-    background:var(--red);
+    background:var(--accent, var(--red));
     margin:14px auto 18px;
   }
   .screen-sub{
@@ -183,7 +184,7 @@
   .tag{
     display:inline-block;
     padding:5px 15px;
-    border:1px solid rgba(255,26,26,.28);
+    border:1px solid color-mix(in srgb, var(--accent, var(--red)) 30%, transparent);
     border-radius:20px;
     font-size:11px;
     font-weight:400;
@@ -192,15 +193,15 @@
     transition:all .25s;
   }
   .tag:hover{
-    border-color:var(--red);
+    border-color:var(--accent, var(--red));
     color:var(--title);
-    background:rgba(255,26,26,.08);
+    background:color-mix(in srgb, var(--accent, var(--red)) 10%, transparent);
   }
   .enter-btn{
     display:inline-block;
     margin-top:22px;
     padding:10px 26px;
-    border:1px solid rgba(255,26,26,.55);
+    border:1px solid color-mix(in srgb, var(--accent, var(--red)) 55%, transparent);
     border-radius:24px;
     color:var(--title);
     font-size:13px;
@@ -209,10 +210,52 @@
     transition:all .25s;
   }
   .enter-btn:hover{
-    background:rgba(255,26,26,.12);
+    background:color-mix(in srgb, var(--accent, var(--red)) 13%, transparent);
     color:#fff;
-    box-shadow:0 0 14px var(--red-glow);
+    box-shadow:0 0 16px color-mix(in srgb, var(--accent, var(--red)) 45%, transparent);
   }
+
+  /* ── 常驻顶栏导航 ── */
+  .topbar{
+    position:fixed;
+    top:0; left:0; right:0;
+    z-index:300;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    padding:9px 18px;
+    background:rgba(0,0,0,.46);
+    backdrop-filter:blur(9px);
+    -webkit-backdrop-filter:blur(9px);
+    border-bottom:1px solid rgba(255,255,255,.07);
+  }
+  .topbar .brand{
+    color:var(--title);
+    text-decoration:none;
+    font-size:15px;
+    font-weight:700;
+    letter-spacing:.12em;
+    text-shadow:0 0 12px var(--red-glow);
+    white-space:nowrap;
+  }
+  .topbar .brand:hover{color:#fff;}
+  .topsys{
+    display:flex;
+    align-items:center;
+    gap:15px;
+    overflow-x:auto;
+    scrollbar-width:none;
+  }
+  .topsys::-webkit-scrollbar{display:none;}
+  .topsys a{
+    color:rgba(255,255,255,.55);
+    text-decoration:none;
+    font-size:12.5px;
+    letter-spacing:.05em;
+    white-space:nowrap;
+    transition:color .2s;
+  }
+  .topsys a:hover{color:var(--title);}
 
   /* ── 尾屏 · 免责 ── */
   .footer-screen{
@@ -281,6 +324,10 @@
     .dot-nav{right:8px;gap:8px;}
     .dot{width:6px;height:6px;}
     .screen{padding:5vh 5vw;}
+    .topbar{padding:8px 12px;}
+    .topbar .brand{font-size:13px;letter-spacing:.08em;}
+    .topsys{gap:11px;max-width:64vw;}
+    .topsys a{font-size:11.5px;}
   }
 
   @media (max-width:340px){
@@ -302,6 +349,20 @@
   <div class="glow" aria-hidden="true"></div>
   <canvas id="particles" aria-hidden="true"></canvas>
 
+  <!-- 常驻顶栏 -->
+  <header class="topbar">
+    <a class="brand" href="#s0">八卦运势</a>
+    <nav class="topsys" aria-label="体系导航">
+      <a href="#s1">八字</a>
+      <a href="#s2">紫微</a>
+      <a href="#s3">梅花</a>
+      <a href="#s4">六爻</a>
+      <a href="#s5">塔罗</a>
+      <a href="#s6">风水</a>
+      <a href="#s7">合婚</a>
+    </nav>
+  </header>
+
   <!-- ═══════════ 第1屏 · Hero（文案严格锁定） ═══════════ -->
   <section class="screen hero" id="s0">
     <div class="screen-inner">
@@ -315,7 +376,7 @@
   </section>
 
   <!-- ═══════════ 第2屏 · 八字命理 ═══════════ -->
-  <section class="screen" id="s1">
+  <section class="screen" id="s1" style="--accent:#d4af6e">
     <div class="screen-inner">
       <div class="screen-label">命 格</div>
       <h2 class="screen-title">八字命理</h2>
@@ -330,7 +391,7 @@
   </section>
 
   <!-- ═══════════ 第3屏 · 紫微斗数 ═══════════ -->
-  <section class="screen" id="s2">
+  <section class="screen" id="s2" style="--accent:#a890ff">
     <div class="screen-inner">
       <div class="screen-label">星 盘</div>
       <h2 class="screen-title">紫微斗数</h2>
@@ -345,7 +406,7 @@
   </section>
 
   <!-- ═══════════ 第4屏 · 梅花易数 ═══════════ -->
-  <section class="screen" id="s3">
+  <section class="screen" id="s3" style="--accent:#6aa3c0">
     <div class="screen-inner">
       <div class="screen-label">占 卜</div>
       <h2 class="screen-title">梅花易数</h2>
@@ -360,7 +421,7 @@
   </section>
 
   <!-- ═══════════ 第5屏 · 六爻纳甲 ═══════════ -->
-  <section class="screen" id="s4">
+  <section class="screen" id="s4" style="--accent:#c5462f">
     <div class="screen-inner">
       <div class="screen-label">铜 钱 卦</div>
       <h2 class="screen-title">六爻纳甲</h2>
@@ -375,7 +436,7 @@
   </section>
 
   <!-- ═══════════ 第6屏 · 塔罗占卜 ═══════════ -->
-  <section class="screen" id="s5">
+  <section class="screen" id="s5" style="--accent:#c9a0ff">
     <div class="screen-inner">
       <div class="screen-label">西 方</div>
       <h2 class="screen-title">塔罗占卜</h2>
@@ -390,7 +451,7 @@
   </section>
 
   <!-- ═══════════ 第7屏 · 风水择吉 ═══════════ -->
-  <section class="screen" id="s6">
+  <section class="screen" id="s6" style="--accent:#5fc9b8">
     <div class="screen-inner">
       <div class="screen-label">时 空</div>
       <h2 class="screen-title">风水择吉</h2>
@@ -405,7 +466,7 @@
   </section>
 
   <!-- ═══════════ 第8屏 · 合婚人格 ═══════════ -->
-  <section class="screen" id="s7">
+  <section class="screen" id="s7" style="--accent:#d98a4a">
     <div class="screen-inner">
       <div class="screen-label">关 系</div>
       <h2 class="screen-title">合婚人格</h2>
@@ -505,8 +566,15 @@
   var screens = document.querySelectorAll('.screen');
   if(!dots.length||!screens.length)return;
 
+  function hexToRgb(h){
+    h=(h||'').replace('#','').trim();
+    if(h.length===3)h=h.split('').map(function(c){return c+c;}).join('');
+    var n=parseInt(h,16); if(isNaN(n))return [255,26,26];
+    return [(n>>16)&255,(n>>8)&255,n&255];
+  }
+  var glow = document.querySelector('.glow');
+
   function highlightActive(){
-    var scrollY = window.pageYOffset || document.documentElement.scrollTop;
     var vh = window.innerHeight;
     var best = 0, bestIdx = 0;
     for(var i=0;i<screens.length;i++){
@@ -514,9 +582,25 @@
       var visible = Math.min(rect.bottom, vh) - Math.max(rect.top, 0);
       if(visible > best){ best = visible; bestIdx = i; }
     }
+    var scr = screens[bestIdx];
+    var acc = (scr && getComputedStyle(scr).getPropertyValue('--accent').trim()) || '#ff1a1a';
+    var rgb = hexToRgb(acc);
+    if(glow){
+      glow.style.background = 'radial-gradient(circle, rgba('+rgb[0]+','+rgb[1]+','+rgb[2]+',.18) 0%, rgba('+rgb[0]+','+rgb[1]+','+rgb[2]+',.04) 38%, transparent 66%)';
+    }
     dots.forEach(function(d){
       var t = parseInt(d.getAttribute('data-target'),10);
-      d.classList.toggle('active', t === bestIdx);
+      var on = (t === bestIdx);
+      d.classList.toggle('active', on);
+      if(on){
+        d.style.background = acc;
+        d.style.borderColor = acc;
+        d.style.boxShadow = '0 0 10px rgba('+rgb[0]+','+rgb[1]+','+rgb[2]+',.5)';
+      }else{
+        d.style.background = '';
+        d.style.borderColor = '';
+        d.style.boxShadow = '';
+      }
     });
   }
 
