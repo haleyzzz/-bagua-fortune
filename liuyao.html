@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>六爻纳甲 · 墨黑朱砂</title>
+<link rel="stylesheet" href="css/common.css">
+<style>
+  :root{
+    --bg:#15110c; --paper:#1c1812; --vermilion:#b8341e;
+    --bronze:#8a6c3a; --jade:#5a8a6a; --gold:#c69838;
+    --accent:#b8341e; --gold-bright:#e8c08a; --ink:#e8dcc0; --panel:#1c1812;
+  }
+  .err{color:#f0a890;background:rgba(184,52,30,.12);border:1px solid rgba(184,52,30,.4);
+    border-radius:8px;padding:12px;font-size:14px;margin-top:14px;display:none}
+  .row{display:flex;gap:12px;flex-wrap:wrap}
+  .row>.col{flex:1;min-width:130px}
+  /* 卦象 */
+  .gua-wrap{display:flex;gap:18px;flex-wrap:wrap;justify-content:center;margin-top:6px}
+  .gua{flex:1;min-width:240px;background:var(--paper);border:1px solid color-mix(in srgb,var(--gold) 22%,transparent);
+    border-radius:14px;padding:16px 14px}
+  .gua .gname{text-align:center;font-size:17px;color:var(--gold-bright);font-weight:700;letter-spacing:2px;margin-bottom:12px}
+  .yao{display:flex;align-items:center;gap:10px;padding:6px 4px;border-bottom:1px solid color-mix(in srgb,var(--gold) 12%,transparent)}
+  .yao:last-child{border-bottom:none}
+  .yao.moving{background:color-mix(in srgb,var(--vermilion) 14%,transparent);border-radius:6px}
+  .draw{flex:flex-direction:column;gap:5px;width:120px;flex:0 0 auto}
+  .bar{height:9px;border-radius:2px;background:var(--ink)}
+  .bar.yin{background:transparent;position:relative}
+  .bar.yin::before,.bar.yin::after{content:"";position:absolute;top:0;height:9px;background:var(--ink);border-radius:2px}
+  .bar.yin::before{left:0;width:52px}.bar.yin::after{right:0;width:52px}
+  .yao.moving .bar{background:var(--vermilion)}
+  .yao.moving .bar.yin::before,.yao.moving .bar.yin::after{background:var(--vermilion)}
+  .info{flex:1;display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+  .gz{font-size:15px;color:var(--gold-bright);font-weight:600;letter-spacing:1px}
+  .qin{font-size:12px;color:var(--jade);border:1px solid color-mix(in srgb,var(--jade) 45%,transparent);padding:1px 8px;border-radius:12px}
+  .god{font-size:12px;color:var(--gold);opacity:.9}
+  .mark{font-size:11px;font-weight:700;padding:1px 7px;border-radius:10px}
+  .mark.shi{background:var(--vermilion);color:#fff}
+  .mark.ying{background:var(--bronze);color:#1a1206}
+  .mark.dong{background:var(--gold);color:#1a1206}
+  .meta{display:flex;gap:10px;flex-wrap:wrap;margin-top:8px;justify-content:center}
+  .meta .m{font-size:12px;color:var(--gold);opacity:.85;letter-spacing:1px}
+  .note{font-size:12px;opacity:.62;margin-top:8px;line-height:1.55}
+  @media(max-width:680px){ .gua{min-width:100%}.draw{width:96px}.bar.yin::before,.bar.yin::after{width:40px} }
+</style>
+</head>
+<body data-page="liuyao">
+<nav class="topnav">
+  <a class="brand" href="index.html">八卦运势<small>Ba Gua Fortune</small></a>
+  <a href="bazi.html">八字</a>
+  <a href="ziwei.html">紫微</a>
+  <a href="meihua.html">梅花</a>
+  <a href="liuyao.html" class="active">六爻</a>
+  <a href="tarot.html">塔罗</a>
+  <a href="fengshui.html">风水</a>
+  <a href="hehun.html">合婚</a>
+</nav>
+
+<div class="wrap">
+  <div class="page-head">
+    <h1>六爻纳甲</h1>
+    <div class="en">LIU YAO NA JIA · Coin Oracle · 墨黑朱砂</div>
+    <div class="sub">三枚铜钱摇卦 · 京房纳甲定世应 · 排六亲六兽 · 动爻朱砂为记</div>
+  </div>
+
+  <div class="card">
+    <h3>起卦</h3>
+    <div class="row">
+      <div class="col">
+        <label>占事日干（定六兽）</label>
+        <select id="lg-daygan">
+          <option value="0">甲日</option><option value="1">乙日</option>
+          <option value="2">丙日</option><option value="3">丁日</option>
+          <option value="4">戊日</option><option value="5">己日</option>
+          <option value="6">庚日</option><option value="7">辛日</option>
+          <option value="8">壬日</option><option value="9">癸日</option>
+        </select>
+      </div>
+      <div class="col">
+        <label>或留空（取当前日干推算）</label>
+        <input id="lg-note" type="text" value="" disabled placeholder="自动取日干">
+      </div>
+    </div>
+    <button class="btn" id="btn-shake">🜆 摇 卦</button>
+    <div class="err" id="err-liuyao"></div>
+  </div>
+
+  <div id="liuyao-result"></div>
+</div>
+
+<footer class="footer">
+  <div class="disclaimer">⚠️ 以上为玄学体系的传统解读与象征推演，仅供参考。本页由 AI 生成，不构成医疗、法律、财务或投资建议；命理是参考，不是定数。涉及健康、法律、重大财务决策请咨询相应专业人士。</div>
+</footer>
+
+<script src="js-engine/src/liuyao.js"></script>
+<script>
+(function(){
+  "use strict";
+  function $(s){return document.querySelector(s);}
+  function el(t,c,h){var e=document.createElement(t);if(c)e.className=c;if(h!=null)e.innerHTML=h;return e;}
+
+  // 每爻一行：阳=整条；阴=两断条（用 yin 类断开）
+  function yaoRow(line, moving){
+    var row=el("div","yao"+(moving?" moving":""));
+    var d=el("div","draw");
+    var b=el("div","bar"+(line.yin?" yin":"")); d.appendChild(b);
+    row.appendChild(d);
+    var info=el("div","info");
+    info.appendChild(el("span","gz",line.gz));
+    info.appendChild(el("span","qin",line.qin));
+    info.appendChild(el("span","god",line.god));
+    if(line.isShi)info.appendChild(el("span","mark shi","世"));
+    if(line.isYing)info.appendChild(el("span","mark ying","应"));
+    if(line.moving)info.appendChild(el("span","mark dong","动"));
+    row.appendChild(info);
+    return row;
+  }
+  function renderGua(title, hex, lines, bianName){
+    var g=el("div","gua");
+    g.appendChild(el("div","gname",title+"　"+hex.name));
+    for(var i=5;i>=0;i--){ // 上→初
+      var ln=lines[i];
+      g.appendChild(yaoRow(ln, ln.moving));
+    }
+    return g;
+  }
+  function render(r){
+    var box=$("#liuyao-result"); box.innerHTML="";
+    var cg=el("div","card"); cg.appendChild(el("h3",null,"卦象 · 本宫 "+r.palace+"（"+r.palaceElem+"）"));
+    var wrap=el("div","gua-wrap");
+    wrap.appendChild(renderGua("本卦", r.ben, r.lines));
+    if(r.hasMoving){
+      // 变卦 lines：取本卦 lines 但 yin 在动爻处翻转，moving 置 false
+      var bl=r.lines.map(function(l){ return {gz:l.gz,zhi:l.zhi,zhiElem:l.zhiElem,yin:l.moving?!l.yin:l.yin,type:l.type,moving:false,qin:l.qin,god:l.god,isShi:l.isShi,isYing:l.isYing}; });
+      wrap.appendChild(renderGua("变卦", r.bian, bl));
+    }
+    cg.appendChild(wrap);
+    cg.appendChild(el("div","meta",
+      "<span class='m'>世爻在第 "+(r.shi+1)+" 爻</span>"+
+      "<span class='m'>应爻在第 "+(r.ying+1)+" 爻</span>"+
+      "<span class='m'>日干 "+r.dayGan+"</span>"+
+      (r.hasMoving?"":"")));
+    cg.appendChild(el("div","note","纳甲依本宫（"+r.palace+"）安六爻干支；六亲依宫五行与本爻地支五行生克（我、生我、我克、克我、同我）；六兽依日干起例。动爻以朱砂色标记，为事之变机。"));
+    box.appendChild(cg);
+    if(!r.hasMoving){
+      box.appendChild(el("div","note","本次摇卦无动爻（静卦），仅断本卦之体，事态相对平稳、变化少。"));
+    }
+    box.scrollIntoView({behavior:"smooth",block:"start"});
+  }
+
+  $("#btn-shake").addEventListener("click",function(){
+    var err=$("#err-liuyao"); err.style.display="none"; err.textContent="";
+    try{
+      var yaos=LIuyao.shake();
+      var dg=+$("#lg-daygan").value;
+      var r=LIuyao.analyze(yaos, dg);
+      render(r);
+    }catch(e){ err.style.display="block"; err.textContent="⚠ "+e.message; }
+  });
+})();
+</script>
+</body>
+</html>

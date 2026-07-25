@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>塔罗占卜 · 深紫鎏金</title>
+<link rel="stylesheet" href="css/common.css">
+<style>
+  :root{
+    --bg:#1a1133; --gold:#d4af37; --purple-deep:#4a2a6a;
+    --ink:#e8dcc0; --red:#c44a3c;
+    --accent:#d4af37; --gold-bright:#f0d880; --panel:rgba(74,42,106,.3);
+  }
+  .err{color:var(--red);background:rgba(196,74,60,.12);border:1px solid rgba(196,74,60,.42);
+    border-radius:8px;padding:12px;font-size:14px;margin-top:14px;display:none}
+  .row{display:flex;gap:12px;flex-wrap:wrap}
+  .row>.col{flex:1;min-width:150px}
+  .chk{display:flex;align-items:center;gap:8px;margin-top:14px;font-size:13.5px;color:var(--gold);letter-spacing:1px;cursor:pointer}
+  .chk input{width:auto;margin:0}
+  /* 牌阵 */
+  .spread-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(175px,1fr));gap:14px}
+  .tcard{background:linear-gradient(180deg,rgba(74,42,106,.42),rgba(26,17,51,.6));
+    border:1px solid color-mix(in srgb,var(--gold) 34%,transparent);border-radius:14px;
+    padding:14px 13px;display:flex;flex-direction:column;gap:8px;position:relative;transition:.18s}
+  .tcard:hover{border-color:var(--gold);box-shadow:0 0 18px rgba(212,175,55,.22)}
+  .tcard.rev{filter:hue-rotate(0);border-color:color-mix(in srgb,var(--red) 42%,transparent)}
+  .tpos{font-size:12.5px;color:var(--gold-bright);letter-spacing:1px;font-weight:600;border-bottom:1px solid color-mix(in srgb,var(--gold) 22%,transparent);padding-bottom:7px}
+  .tpos .pdesc{display:block;font-size:10.5px;color:var(--ink);opacity:.6;font-weight:400;letter-spacing:0;margin-top:2px}
+  .tface{text-align:center;padding:8px 0}
+  .tname{font-size:21px;color:var(--ink);font-weight:700;letter-spacing:2px}
+  .ten{font-size:11px;color:var(--gold);opacity:.78;letter-spacing:1px;margin-top:3px;font-style:italic}
+  .torient{display:inline-block;margin-top:7px;font-size:11px;padding:1px 12px;border-radius:14px;letter-spacing:2px}
+  .torient.up{background:color-mix(in srgb,var(--gold) 16%,transparent);color:var(--gold-bright);border:1px solid color-mix(in srgb,var(--gold) 45%,transparent)}
+  .torient.dn{background:rgba(196,74,60,.18);color:#f0a890;border:1px solid rgba(196,74,60,.5)}
+  .ttype{position:absolute;top:10px;right:12px;font-size:9.5px;color:var(--gold);opacity:.6;letter-spacing:1px}
+  .tmean{font-size:12.5px;color:var(--ink);opacity:.9;line-height:1.6;border-top:1px solid color-mix(in srgb,var(--gold) 18%,transparent);padding-top:9px}
+  .note{font-size:12px;opacity:.6;margin-top:10px;line-height:1.55}
+  @media(max-width:680px){ .spread-grid{grid-template-columns:repeat(auto-fill,minmax(140px,1fr))} }
+</style>
+</head>
+<body data-page="tarot">
+<nav class="topnav">
+  <a class="brand" href="index.html">八卦运势<small>Ba Gua Fortune</small></a>
+  <a href="bazi.html">八字</a>
+  <a href="ziwei.html">紫微</a>
+  <a href="meihua.html">梅花</a>
+  <a href="liuyao.html">六爻</a>
+  <a href="tarot.html" class="active">塔罗</a>
+  <a href="fengshui.html">风水</a>
+  <a href="hehun.html">合婚</a>
+</nav>
+
+<div class="wrap">
+  <div class="page-head">
+    <h1>塔罗占卜</h1>
+    <div class="en">TAROT · Rider-Waite-Smith · 深紫鎏金</div>
+    <div class="sub">RWS 78 张全套 · 三牌 / 凯尔特十字 / 感情 / 每日一牌</div>
+  </div>
+
+  <div class="card">
+    <h3>选牌阵 <span class="badge">静心片刻再抽</span></h3>
+    <div class="row">
+      <div class="col">
+        <label>牌阵</label>
+        <select id="spread">
+          <option value="three">三牌阵 · 过去 / 现在 / 未来</option>
+          <option value="celtic">凯尔特十字 · 十张</option>
+          <option value="love">感情牌阵 · 六张</option>
+          <option value="daily">每日一牌</option>
+        </select>
+      </div>
+    </div>
+    <label class="chk"><input type="checkbox" id="rev" checked> 允许逆位（正逆位解读）</label>
+    <button class="btn" id="btn-draw">🜍 抽 牌</button>
+    <div class="err" id="err-tarot"></div>
+  </div>
+
+  <div id="tarot-result"></div>
+</div>
+
+<footer class="footer">
+  <div class="disclaimer">⚠️ 以上为玄学体系的传统解读与象征推演，仅供参考。本页由 AI 生成，不构成医疗、法律、财务或投资建议；命理是参考，不是定数。涉及健康、法律、重大财务决策请咨询相应专业人士。</div>
+</footer>
+
+<script src="js-engine/src/tarot.js"></script>
+<script>
+(function(){
+  "use strict";
+  function $(s){return document.querySelector(s);}
+  function el(t,c,h){var e=document.createElement(t);if(c)e.className=c;if(h!=null)e.innerHTML=h;return e;}
+
+  $("#btn-draw").addEventListener("click",function(){
+    var err=$("#err-tarot"); err.style.display="none"; err.textContent="";
+    try{
+      var key=$("#spread").value;
+      var sp=TAROT.SPREADS[key];
+      if(!sp) throw new Error("未知牌阵");
+      var allowRev=$("#rev").checked;
+      var drawn=TAROT.draw(sp.pos.length, allowRev);
+      render(sp, drawn);
+    }catch(e){ err.style.display="block"; err.textContent="⚠ "+e.message; }
+  });
+
+  function render(sp, drawn){
+    var box=$("#tarot-result"); box.innerHTML="";
+    var c=el("div","card");
+    c.appendChild(el("h3",null,sp.name+" <span class='badge'>"+drawn.length+" 张</span>"));
+    var grid=el("div","spread-grid");
+    sp.pos.forEach(function(p,i){
+      var d=drawn[i];
+      if(!d){ return; }
+      var card=d.card;
+      var tc=el("div","tcard"+(d.reversed?" rev":""));
+      tc.appendChild(el("div","ttype",card.type==="major"?"大阿尔卡那":"小阿尔卡那"));
+      var pos=el("div","tpos",p.label);
+      pos.appendChild(el("span","pdesc",p.desc));
+      tc.appendChild(pos);
+      var face=el("div","tface");
+      face.appendChild(el("div","tname",card.cn||(card.num?"":"牌")));
+      face.appendChild(el("div","ten",card.en||""));
+      face.appendChild(el("div","torient "+(d.reversed?"dn":"up"),d.reversed?"逆位":"正位"));
+      tc.appendChild(face);
+      tc.appendChild(el("div","tmean",d.meaning||""));
+      grid.appendChild(tc);
+    });
+    c.appendChild(grid);
+    c.appendChild(el("div","note","塔罗以意象与直觉为引，以上为牌义参考。同一组牌在不同心境下会浮现不同讯息，请以自己的感受为最终判准。"));
+    box.appendChild(c);
+    box.scrollIntoView({behavior:"smooth",block:"start"});
+  }
+})();
+</script>
+</body>
+</html>

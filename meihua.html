@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>梅花易数 · 素纸水墨</title>
+<link rel="stylesheet" href="css/common.css">
+<style>
+  :root{
+    --bg:#f3eee2; --paper:#faf6e8; --ink:#1a1a1a; --water:#6890a8;
+    --line:#b8b0a0; --accent:#6890a8; --gold-bright:#4a6f86;
+    --panel:#faf6e8;
+  }
+  .tabs{display:flex;gap:10px;justify-content:center;margin:22px 0}
+  .tab{cursor:pointer;padding:9px 26px;border:1px solid color-mix(in srgb,var(--water) 32%,transparent);
+    border-radius:30px;color:var(--water);font-size:15px;letter-spacing:2px;transition:.2s;background:transparent}
+  .tab.active{background:linear-gradient(180deg,#dfeaf0,#eef3f6);color:var(--ink);border-color:var(--water);box-shadow:0 0 14px rgba(104,144,168,.18)}
+  .panel{display:none}
+  .panel.active{display:block;animation:fade .35s ease}
+  @keyframes fade{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+  .err{color:#9a3b2a;background:rgba(154,59,42,.08);border:1px solid rgba(154,59,42,.32);
+    border-radius:8px;padding:12px;font-size:14px;margin-top:14px;display:none}
+  /* 卦盘 */
+  .hexrow{display:flex;gap:16px;flex-wrap:wrap;justify-content:center;margin-top:6px}
+  .hex{flex:1;min-width:170px;background:var(--paper);border:1px solid color-mix(in srgb,var(--water) 22%,transparent);
+    border-radius:14px;padding:16px 14px;text-align:center}
+  .hex .htitle{font-size:16px;color:var(--ink);font-weight:700;letter-spacing:2px;margin-bottom:4px}
+  .hex .htag{font-size:11px;color:var(--water);letter-spacing:1px;margin-bottom:12px}
+  .yaos{display:flex;flex-direction:column;gap:6px;align-items:center;margin:6px auto 12px;width:88px}
+  .yao{height:8px;border-radius:2px;background:var(--ink)}
+  .yao.yang{width:88px}
+  .yao.yin{width:88px;background:transparent;position:relative}
+  .yao.yin::before,.yao.yin::after{content:"";position:absolute;top:0;height:8px;background:var(--ink);border-radius:2px}
+  .yao.yin::before{left:0;width:38px}.yao.yin::after{right:0;width:38px}
+  .yao.dong{box-shadow:0 0 0 2px rgba(154,59,42,.55);background:#9a3b2a}
+  .yao.yin.dong::before,.yao.yin.dong::after{background:#9a3b2a}
+  .hex .tuan{font-size:12.5px;color:var(--ink);opacity:.82;line-height:1.6;margin-top:4px}
+  .hex .da{font-size:11.5px;color:var(--water);opacity:.9;line-height:1.6;margin-top:6px;font-style:italic}
+  /* 体用 */
+  .ty{display:flex;align-items:center;justify-content:center;gap:14px;flex-wrap:wrap;margin-top:4px}
+  .ty .big{font-size:24px;font-weight:700;color:var(--ink);letter-spacing:2px}
+  .ty .lv{font-size:14px;padding:3px 14px;border-radius:20px;color:#fff}
+  .lv.g{background:#4f8a5a}.lv.x{background:#9a3b2a}.lv.p{background:#8a8a6a}
+  .ty .elem{font-size:12px;color:var(--water);opacity:.9}
+  .note{font-size:12px;opacity:.62;margin-top:8px;line-height:1.55}
+  .inline-input{flex:1;min-width:120px}
+  @media(max-width:680px){ .hex{min-width:140px} .yao.yang,.yao.yin{width:72px}.yao.yin::before,.yao.yin::after{width:31px} }
+</style>
+</head>
+<body data-page="meihua">
+<nav class="topnav">
+  <a class="brand" href="index.html">八卦运势<small>Ba Gua Fortune</small></a>
+  <a href="bazi.html">八字</a>
+  <a href="ziwei.html">紫微</a>
+  <a href="meihua.html" class="active">梅花</a>
+  <a href="liuyao.html">六爻</a>
+  <a href="tarot.html">塔罗</a>
+  <a href="fengshui.html">风水</a>
+  <a href="hehun.html">合婚</a>
+</nav>
+
+<div class="wrap">
+  <div class="page-head">
+    <h1>梅花易数</h1>
+    <div class="en">MEI HUA YI SHU · Plum Blossom · 素纸水墨</div>
+    <div class="sub">时间 / 数字 / 方位起卦 · 本卦互卦变卦 · 体用生克断吉凶</div>
+  </div>
+
+  <div class="tabs">
+    <div class="tab active" data-tab="time">时间起卦</div>
+    <div class="tab" data-tab="num">数字起卦</div>
+    <div class="tab" data-tab="dir">方位起卦</div>
+  </div>
+
+  <!-- 时间 -->
+  <section class="panel active" id="panel-time">
+    <div class="card">
+      <h3>时间起卦 <span class="badge">取当前时刻</span></h3>
+      <div class="row">
+        <div class="col"><label>年支</label><select id="t-yzhi"></select></div>
+        <div class="col"><label>月</label><input id="t-m" type="number" value="" placeholder="农历月"></div>
+        <div class="col"><label>日</label><input id="t-d" type="number" value="" placeholder="农历日"></div>
+        <div class="col"><label>时支</label><select id="t-hzhi"></select></div>
+      </div>
+      <div class="note">留空则自动取此刻公历对应的农历日期与干支。也可手填农历年月日时支。</div>
+      <button class="btn" id="btn-time">起 卦</button>
+      <div class="err" id="err-time"></div>
+    </div>
+  </section>
+
+  <!-- 数字 -->
+  <section class="panel" id="panel-num">
+    <div class="card">
+      <h3>数字起卦 <span class="badge">至少两个数字</span></h3>
+      <div class="row">
+        <div class="col"><label>数字 ①</label><input id="n1" type="number" value="3"></div>
+        <div class="col"><label>数字 ②</label><input id="n2" type="number" value="8"></div>
+        <div class="col"><label>数字 ③（可选）</label><input id="n3" type="number" value="5"></div>
+      </div>
+      <div class="note">上卦 = 数① % 8，下卦 = 数② % 8，动爻 =（数①+数②+数③） % 6。</div>
+      <button class="btn" id="btn-num">起 卦</button>
+      <div class="err" id="err-num"></div>
+    </div>
+  </section>
+
+  <!-- 方位 -->
+  <section class="panel" id="panel-dir">
+    <div class="card">
+      <h3>方位起卦 <span class="badge">面朝方位</span></h3>
+      <div class="row">
+        <div class="col"><label>所面方位</label>
+          <select id="d-dir">
+            <option value="东">东</option><option value="南">南</option>
+            <option value="西">西</option><option value="北">北</option>
+            <option value="东南">东南</option><option value="西南">西南</option>
+            <option value="西北">西北</option><option value="东北">东北</option>
+            <option value="中">中</option>
+          </select>
+        </div>
+        <div class="col"><label>附加数（可选）</label><input id="d-extra" type="number" value="0"></div>
+      </div>
+      <div class="note">上卦 = 方位数(东3南1西7北6东南5西南2西北8东北4中5)，下卦取年月日，动爻取方位数+年支月日。</div>
+      <button class="btn" id="btn-dir">起 卦</button>
+      <div class="err" id="err-dir"></div>
+    </div>
+  </section>
+
+  <div id="meihua-result"></div>
+</div>
+
+<footer class="footer">
+  <div class="disclaimer">⚠️ 以上为玄学体系的传统解读与象征推演，仅供参考。本页由 AI 生成，不构成医疗、法律、财务或投资建议；命理是参考，不是定数。涉及健康、法律、重大财务决策请咨询相应专业人士。</div>
+</footer>
+
+<script src="js-engine/src/meihua.js"></script>
+<script>
+(function(){
+  "use strict";
+  function $(s){return document.querySelector(s);}
+  function el(t,c,h){var e=document.createElement(t);if(c)e.className=c;if(h!=null)e.innerHTML=h;return e;}
+  // tabs
+  document.querySelectorAll(".tab").forEach(function(t){
+    t.addEventListener("click",function(){
+      document.querySelectorAll(".tab").forEach(function(x){x.classList.toggle("active",x===t);});
+      document.querySelectorAll(".panel").forEach(function(p){p.classList.toggle("active",p.id==="panel-"+t.dataset.tab);});
+    });
+  });
+  // 填充下拉
+  var ZHI=["子","丑","寅","卯","辰","巳","午","未","申","酉","戌","亥"];
+  ZHI.forEach(function(z){ $("#t-yzhi").appendChild(el("option",null,z)); $("#t-hzhi").appendChild(el("option",null,z)); });
+
+  function yaosHTML(yaos, dong){
+    var box=el("div","yaos");
+    for(var i=5;i>=0;i--){
+      var v=yaos[i];
+      var y=el("div","yao "+(v?"yang":"yin")+(i+1===dong?" dong":""));
+      box.appendChild(y);
+    }
+    return box;
+  }
+  function hexCard(title,tag,yaos,dong,name,tuan,da){
+    var h=el("div","hex");
+    h.appendChild(el("div","htitle",title));
+    h.appendChild(el("div","htag",tag));
+    h.appendChild(yaosHTML(yaos,dong));
+    h.appendChild(el("div","tuan","〈"+name+"〉 "+tuan));
+    h.appendChild(el("div","da","大象："+da));
+    return h;
+  }
+  function render(g){
+    var box=$("#meihua-result"); box.innerHTML="";
+    // 本卦爻
+    var benY=g.yaos;
+    var benInfo=MEHUA.hexInfo(g.benIdx);
+    // 互卦爻: (y1,y2,y3)下 (y2,y3,y4)上
+    var huY=[benY[1],benY[2],benY[3],benY[2],benY[3],benY[4]];
+    var huInfo=MEHUA.hexInfo(MEHUA.hexIndex(g.huUp,g.huDown));
+    // 变卦爻: dong 位翻转
+    var bianY=benY.slice(); bianY[g.dong-1]=bianY[g.dong-1]?0:1;
+    var bianInfo=MEHUA.hexInfo(MEHUA.hexIndex(g.bianUp,g.bianDown));
+
+    var cg=el("div","card"); cg.appendChild(el("h3",null,"三卦 · "+g.method+" <span class='badge'>"+g.meta+"</span>"));
+    var row=el("div","hexrow");
+    row.appendChild(hexCard("本卦",g.dong+" 爻动",benY,g.dong,g.benName,g.benTuan,g.benDa));
+    row.appendChild(hexCard("互卦","",huY,null,huInfo.name,huInfo.tuan,huInfo.da));
+    row.appendChild(hexCard("变卦","",bianY,null,bianInfo.name,bianInfo.tuan,bianInfo.da));
+    cg.appendChild(row);
+    box.appendChild(cg);
+
+    // 体用
+    var ty=g.ty;
+    var lvcls= ty.level==="吉"?"g":(ty.level==="凶"?"x":"p");
+    var ct=el("div","card"); ct.appendChild(el("h3",null,"体用生克"));
+    var t=el("div","ty");
+    t.appendChild(el("div","big",ty.verdict));
+    t.appendChild(el("div","lv "+lvcls,ty.level));
+    t.appendChild(el("div","elem",ty.note));
+    ct.appendChild(t);
+    ct.appendChild(el("div","note","体为事之主体，用为事之客体。用生体为吉、体克用亦吉；体生用泄气、用克体为凶；比和则平。"));
+    box.appendChild(ct);
+    box.scrollIntoView({behavior:"smooth",block:"start"});
+  }
+  function fail(id,msg){ var e=$(id); e.style.display="block"; e.textContent="⚠ "+msg; }
+
+  $("#btn-time").addEventListener("click",function(){
+    $("#err-time").style.display="none";
+    try{
+      var opt={};
+      var yz=$("#t-yzhi").value, md=$("#t-m").value, dd=$("#t-d").value, hz=$("#t-hzhi").value;
+      if(yz)opt.yearZhi=yz; if(md)opt.month=+md; if(dd)opt.day=+dd; if(hz)opt.hourZhi=hz;
+      if((md&&!dd)||(dd&&!md)) throw new Error("月日需同时填写或同时留空");
+      render(MEHUA.fromTime(opt));
+    }catch(e){ fail("#err-time",e.message); }
+  });
+  $("#btn-num").addEventListener("click",function(){
+    $("#err-num").style.display="none";
+    try{
+      var nums=[$("#n1").value,$("#n2").value,$("#n3").value].filter(function(x){return x!=="";}).map(Number);
+      render(MEHUA.fromNumbers(nums));
+    }catch(e){ fail("#err-num",e.message); }
+  });
+  $("#btn-dir").addEventListener("click",function(){
+    $("#err-dir").style.display="none";
+    try{
+      var extra=$("#d-extra").value!==""?(+$("#d-extra").value):0;
+      render(MEHUA.fromDirection($("#d-dir").value, extra));
+    }catch(e){ fail("#err-dir",e.message); }
+  });
+})();
+</script>
+</body>
+</html>

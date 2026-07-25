@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>风水择吉 · 墨绿古铜</title>
+<link rel="stylesheet" href="css/common.css">
+<style>
+  :root{
+    --bg:#0f1a1a; --jade:#6dcbbf; --gold:#e0b555; --red:#d85848;
+    --bronze:#b8a878; --accent:#6dcbbf; --gold-bright:#e0b555;
+    --ink:#d8e8e0; --panel:rgba(20,40,38,.42);
+  }
+  .tabs{display:flex;gap:10px;justify-content:center;margin:22px 0}
+  .tab{cursor:pointer;padding:9px 24px;border:1px solid color-mix(in srgb,var(--jade) 30%,transparent);
+    border-radius:30px;color:var(--jade);font-size:15px;letter-spacing:2px;transition:.2s;background:transparent}
+  .tab.active{background:linear-gradient(180deg,rgba(109,203,191,.16),var(--panel));color:var(--gold-bright);
+    border-color:var(--jade);box-shadow:0 0 16px rgba(109,203,191,.2)}
+  .panel{display:none}
+  .panel.active{display:block;animation:fade .35s ease}
+  @keyframes fade{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+  .err{color:var(--red);background:rgba(216,88,72,.1);border:1px solid rgba(216,88,72,.4);
+    border-radius:8px;padding:12px;font-size:14px;margin-top:14px;display:none}
+  .row{display:flex;gap:12px;flex-wrap:wrap}
+  .row>.col{flex:1;min-width:120px}
+  /* 九宫 */
+  .luo{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;max-width:440px;margin:6px auto 0}
+  .cell9{background:var(--panel);border:1px solid color-mix(in srgb,var(--jade) 24%,transparent);
+    border-radius:12px;padding:12px 8px;text-align:center;min-height:96px}
+  .cell9 .dir{font-size:11px;color:var(--bronze);letter-spacing:1px}
+  .cell9 .nums{display:flex;flex-direction:column;gap:3px;margin-top:6px}
+  .nline{display:flex;justify-content:center;gap:6px;font-size:16px;color:var(--ink)}
+  .nl{font-size:11px;color:var(--jade);opacity:.7;width:18px;text-align:right}
+  .nnum{font-weight:600;color:var(--gold-bright)}
+  .nstar.big{font-size:22px;color:var(--gold-bright)}
+  .luck{font-size:10.5px;margin-top:5px;padding:1px 8px;border-radius:12px;display:inline-block}
+  .luck.wang{background:rgba(224,181,85,.18);color:var(--gold-bright);border:1px solid rgba(224,181,85,.5)}
+  .luck.sheng{background:rgba(109,203,191,.16);color:var(--jade);border:1px solid rgba(109,203,191,.45)}
+  .luck.tui{background:rgba(184,168,120,.12);color:var(--bronze);border:1px solid rgba(184,168,120,.4)}
+  .luck.zhi{font-size:13px;background:rgba(109,203,191,.12);color:var(--jade);border:1px solid rgba(109,203,191,.3)}
+  /* 奇门星门神 */
+  .qcell{background:var(--panel);border:1px solid color-mix(in srgb,var(--jade) 24%,transparent);
+    border-radius:10px;padding:9px 6px;text-align:center;min-height:92px}
+  .qcell.zf{background:linear-gradient(180deg,rgba(224,181,85,.16),var(--panel));border-color:var(--gold)}
+  .qcell .gno{font-size:11px;color:var(--bronze)}
+  .qcell .qx{font-size:14px;color:var(--gold-bright);font-weight:600;margin:3px 0}
+  .qcell .qi{font-size:11.5px;color:var(--ink);line-height:1.5}
+  .qcell .qi b{color:var(--jade);font-weight:400}
+  /* 择吉列表 */
+  .rilist{display:flex;flex-direction:column;gap:8px}
+  .ri{background:var(--panel);border:1px solid color-mix(in srgb,var(--jade) 20%,transparent);
+    border-radius:10px;padding:10px 14px;display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
+  .ri .d{font-size:15px;color:var(--gold-bright);font-weight:600}
+  .ri .yj{font-size:11.5px;opacity:.8}
+  .ri .yj .yi{color:var(--jade)} .ri .yj .ji{color:var(--red)}
+  .note{font-size:12px;opacity:.62;margin-top:8px;line-height:1.55}
+  .kv{display:flex;gap:10px;flex-wrap:wrap;margin-top:8px}
+  .kv .k{font-size:12px;color:var(--jade);opacity:.85;letter-spacing:1px}
+  @media(max-width:680px){ .luo{max-width:100%} .qcell{min-height:78px} }
+</style>
+</head>
+<body data-page="fengshui">
+<nav class="topnav">
+  <a class="brand" href="index.html">八卦运势<small>Ba Gua Fortune</small></a>
+  <a href="bazi.html">八字</a>
+  <a href="ziwei.html">紫微</a>
+  <a href="meihua.html">梅花</a>
+  <a href="liuyao.html">六爻</a>
+  <a href="tarot.html">塔罗</a>
+  <a href="fengshui.html" class="active">风水</a>
+  <a href="hehun.html">合婚</a>
+</nav>
+
+<div class="wrap">
+  <div class="page-head">
+    <h1>风水择吉</h1>
+    <div class="en">FENG SHUI · Flying Star &amp; Qimen · 墨绿古铜</div>
+    <div class="sub">玄空飞星 · 奇门遁甲 · 黄历择日（传统规则推演，供参考）</div>
+  </div>
+
+  <div class="tabs">
+    <div class="tab active" data-tab="feixing">玄空飞星</div>
+    <div class="tab" data-tab="qimen">奇门遁甲</div>
+    <div class="tab" data-tab="zeri">黄历择吉</div>
+  </div>
+
+  <!-- 飞星 -->
+  <section class="panel active" id="panel-feixing">
+    <div class="card">
+      <h3>玄空飞星盘</h3>
+      <div class="row">
+        <div class="col"><label>年份</label><input id="fx-year" type="number" value="2026"></div>
+        <div class="col">
+          <label>坐山</label>
+          <select id="fx-sit">
+            <option value="子">子</option><option value="癸">癸</option><option value="丑">丑</option>
+            <option value="艮">艮</option><option value="寅">寅</option><option value="甲">甲</option>
+            <option value="卯">卯</option><option value="乙">乙</option><option value="辰">辰</option>
+            <option value="巽">巽</option><option value="巳">巳</option><option value="丙">丙</option>
+            <option value="午">午</option><option value="丁">丁</option><option value="未">未</option>
+            <option value="坤">坤</option><option value="申">申</option><option value="庚">庚</option>
+            <option value="酉">酉</option><option value="辛">辛</option><option value="戌">戌</option>
+            <option value="乾">乾</option><option value="亥">亥</option><option value="壬">壬</option>
+          </select>
+        </div>
+        <div class="col">
+          <label>朝向</label>
+          <select id="fx-face">
+            <option value="午">午</option><option value="丁">丁</option><option value="未">未</option>
+            <option value="坤">坤</option><option value="申">申</option><option value="庚">庚</option>
+            <option value="酉">酉</option><option value="辛">辛</option><option value="戌">戌</option>
+            <option value="乾">乾</option><option value="亥">亥</option><option value="壬">壬</option>
+            <option value="子">子</option><option value="癸">癸</option><option value="丑">丑</option>
+            <option value="艮">艮</option><option value="寅">寅</option><option value="甲">甲</option>
+            <option value="卯">卯</option><option value="乙">乙</option><option value="辰">辰</option>
+            <option value="巽">巽</option><option value="巳">巳</option><option value="丙">丙</option>
+          </select>
+        </div>
+      </div>
+      <button class="btn" id="btn-fx">排 盘</button>
+      <div class="err" id="err-fx"></div>
+    </div>
+    <div id="fx-result"></div>
+  </section>
+
+  <!-- 奇门 -->
+  <section class="panel" id="panel-qimen">
+    <div class="card">
+      <h3>奇门遁甲局</h3>
+      <div class="row">
+        <div class="col"><label>年</label><input id="qm-y" type="number" value="2026"></div>
+        <div class="col"><label>月</label><input id="qm-m" type="number" value="6" min="1" max="12"></div>
+        <div class="col"><label>日</label><input id="qm-d" type="number" value="24" min="1" max="31"></div>
+        <div class="col"><label>时(0-23)</label><input id="qm-h" type="number" value="16" min="0" max="23"></div>
+      </div>
+      <button class="btn" id="btn-qm">起 局</button>
+      <div class="err" id="err-qm"></div>
+    </div>
+    <div id="qm-result"></div>
+  </section>
+
+  <!-- 择吉 -->
+  <section class="panel" id="panel-zeri">
+    <div class="card">
+      <h3>黄历择日</h3>
+      <div class="row">
+        <div class="col"><label>年份</label><input id="zr-y" type="number" value="2026"></div>
+        <div class="col"><label>月份</label><input id="zr-m" type="number" value="8" min="1" max="12"></div>
+        <div class="col">
+          <label>用途</label>
+          <select id="zr-use">
+            <option value="嫁娶">嫁娶</option><option value="动土">动土</option>
+            <option value="开市">开市</option><option value="入宅">入宅</option>
+            <option value="出行">出行</option><option value="安门">安门</option>
+            <option value="安床">安床</option><option value="安葬">安葬</option>
+            <option value="求嗣">求嗣</option>
+          </select>
+        </div>
+      </div>
+      <button class="btn" id="btn-zr">查吉日</button>
+      <div class="err" id="err-zr"></div>
+    </div>
+    <div id="zr-result"></div>
+  </section>
+</div>
+
+<footer class="footer">
+  <div class="disclaimer">⚠️ 以上为玄学体系的传统解读与象征推演，仅供参考。本页由 AI 生成，不构成医疗、法律、财务或投资建议；命理是参考，不是定数。涉及健康、法律、重大财务决策请咨询相应专业人士。</div>
+</footer>
+
+<script src="js-engine/src/data.js"></script>
+<script src="js-engine/src/engine.js"></script>
+<script src="js-engine/src/fengshui.js"></script>
+<script>
+(function(){
+  "use strict";
+  function $(s){return document.querySelector(s);}
+  function el(t,c,h){var e=document.createElement(t);if(c)e.className=c;if(h!=null)e.innerHTML=h;return e;}
+  // tabs
+  document.querySelectorAll(".tab").forEach(function(t){
+    t.addEventListener("click",function(){
+      document.querySelectorAll(".tab").forEach(function(x){x.classList.toggle("active",x===t);});
+      document.querySelectorAll(".panel").forEach(function(p){p.classList.toggle("active",p.id==="panel-"+t.dataset.tab);});
+    });
+  });
+  // 九宫空间序（洛书）：巽4 离9 坤2 / 震3 中5 兑7 / 艮8 坎1 乾6
+  var LUO=[4,9,2,3,5,7,8,1,6];
+  var GONG_NAME={5:"中宫",6:"乾·西北",7:"兑·西",8:"艮·东北",9:"离·南",1:"坎·北",2:"坤·西南",3:"震·东",4:"巽·东南"};
+  // 飞星吉凶（简化：下元九运，旺=9，生气=1/2，余为退）
+  function luck(n){
+    if(n===9)return {cls:"wang",txt:"旺"};
+    if(n===1||n===2)return {cls:"sheng",txt:"生气"};
+    if(n>=3&&n<=8)return {cls:"tui",txt:"退气"};
+    return {cls:"tui",txt:"中"};
+  }
+  function renderLuo(panGetter, bigKey){
+    var grid=el("div","luo");
+    LUO.forEach(function(g){
+      var c=el("div","cell9");
+      c.appendChild(el("div","dir",GONG_NAME[g]));
+      var nums=el("div","nums");
+      var rows=panGetter(g);
+      rows.forEach(function(r){
+        var line=el("div","nline");
+        line.appendChild(el("span","nl",r.l));
+        line.appendChild(el("span","nnum"+(r.big?" big":""),r.n));
+        nums.appendChild(line);
+      });
+      c.appendChild(nums);
+      // 吉凶标记用山星
+      var lk=luck(panGetter(g)[1].n);
+      c.appendChild(el("span","luck "+lk.cls,lk.txt));
+      grid.appendChild(c);
+    });
+    return grid;
+  }
+
+  // 飞星
+  $("#btn-fx").addEventListener("click",function(){
+    var err=$("#err-fx");err.style.display="none";err.textContent="";
+    try{
+      var year=+$("#fx-year").value, sit=$("#fx-sit").value, face=$("#fx-face").value;
+      if(!year)throw new Error("请填写年份");
+      var fx=FENGSHUI.feixing(year,sit,face);
+      var box=$("#fx-result");box.innerHTML="";
+      var c=el("div","card");
+      c.appendChild(el("h3",null,"飞星盘 · "+year+"年 · "+sit+"山"+face+"向 ("+fx.yun+"运·"+fx.yuan+")"));
+      var grid=renderLuo(function(g){
+        return [
+          {l:"运",n:fx.yunPan[g]},
+          {l:"山",n:fx.shanPan[g],big:true},
+          {l:"向",n:fx.xiangPan[g]}
+        ];
+      });
+      c.appendChild(grid);
+      c.appendChild(el("div","note","三盘：运盘（中宫入运星顺飞）、山盘（坐山宫运星入中，依天/人/地元龙阴阳顺逆飞）、向盘（朝向宫运星入中）。年星"+fx.yearStar+"入中顺飞。下方标记以山星论旺/生气/退气（下元九运简化），实际吉凶须合峦头形势，仅作参考。"));
+      box.appendChild(c);
+    }catch(e){err.style.display="block";err.textContent="⚠ "+e.message;}
+  });
+
+  // 奇门
+  $("#btn-qm").addEventListener("click",function(){
+    var err=$("#err-qm");err.style.display="none";err.textContent="";
+    try{
+      var y=+$("#qm-y").value,m=+$("#qm-m").value,d=+$("#qm-d").value,h=+$("#qm-h").value;
+      if(!y||!m||!d)throw new Error("请填写完整的年月日");
+      var q=FENGSHUI.qimen(y,m,d,h);
+      var box=$("#qm-result");box.innerHTML="";
+      var c=el("div","card");
+      c.appendChild(el("h3",null,"奇门局 · "+q.jieqi+" · "+q.yuan+(q.isYang?"（阳遁）":"（阴遁）")+" "+q.ju+"局"));
+      var kv=el("div","kv");
+      kv.appendChild(el("span","k","日干支："+q.dayGZ));
+      kv.appendChild(el("span","k","时干支："+q.hourGZ));
+      kv.appendChild(el("span","k","旬首："+q.xun));
+      kv.appendChild(el("span","k","值符落宫："+GONG_NAME[q.zhiGong]));
+      c.appendChild(kv);
+      var grid=el("div","luo");
+      LUO.forEach(function(g){
+        var cc=el("div","qcell"+(g===q.zhiGong?" zf":""));
+        cc.appendChild(el("div","gno",GONG_NAME[g]));
+        cc.appendChild(el("div","qx",(q.tian[g]||"").replace("天","")));
+        var qi=el("div","qi");
+        qi.innerHTML="<b>门</b> "+(q.men[g]||"")+"　<b>神</b> "+(q.shen[g]||"");
+        cc.appendChild(qi);
+        grid.appendChild(cc);
+      });
+      c.appendChild(grid);
+      c.appendChild(el("div","note","九宫三层：星（天盘九星）、门（八门）、神（八神）。值符落宫以金框标出。奇门重在用神与格局，此盘供初步排布参考，实际应用请结合问事用神与专业判断。"));
+      box.appendChild(c);
+    }catch(e){err.style.display="block";err.textContent="⚠ "+e.message;}
+  });
+
+  // 择吉
+  $("#btn-zr").addEventListener("click",function(){
+    var err=$("#err-zr");err.style.display="none";err.textContent="";
+    try{
+      var y=+$("#zr-y").value,m=+$("#zr-m").value,use=$("#zr-use").value;
+      if(!y||!m)throw new Error("请填写年份与月份");
+      var list=FENGSHUI.zeri(y,m,use,BZ.queryAlmanac);
+      var box=$("#zr-result");box.innerHTML="";
+      var c=el("div","card");
+      c.appendChild(el("h3",null,"择吉 · "+y+"年"+m+"月 · 宜「"+use+"」"));
+      if(!list.length){ c.appendChild(el("div","note","本月黄历中无「"+use+"」宜日，可换月或换用途查看。")); box.appendChild(c); return; }
+      var rl=el("div","rilist");
+      list.forEach(function(it){
+        var r=el("div","ri");
+        r.appendChild(el("div","d",it.solar));
+        var yj=el("div","yj","<span class='yi'>宜："+it.yi.join("、")+"</span>　<span class='ji'>忌："+it.ji.join("、")+"</span>");
+        r.appendChild(yj);
+        rl.appendChild(r);
+      });
+      c.appendChild(rl);
+      c.appendChild(el("div","note","筛选自黄历「宜」含「"+use+"」之日。择日宜再合当事人八字与方位，此表仅作初步参考。"));
+      box.appendChild(c);
+    }catch(e){err.style.display="block";err.textContent="⚠ "+e.message;}
+  });
+})();
+</script>
+</body>
+</html>

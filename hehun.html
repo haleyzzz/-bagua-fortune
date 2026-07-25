@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>合婚人格 · 米黄古籍</title>
+<link rel="stylesheet" href="css/common.css">
+<style>
+  :root{
+    --bg:#f5ecd6; --paper:#fbf4dc; --ink:#2a2418; --vermilion:#a83018;
+    --bronze:#8a6824; --accent:#8a6824; --gold-bright:#8a6824; --panel:#fbf4dc;
+  }
+  .tabs{display:flex;gap:10px;justify-content:center;margin:22px 0}
+  .tab{cursor:pointer;padding:9px 24px;border:1px solid color-mix(in srgb,var(--bronze) 32%,transparent);
+    border-radius:30px;color:var(--bronze);font-size:15px;letter-spacing:2px;transition:.2s;background:transparent}
+  .tab.active{background:linear-gradient(180deg,#efe4c8,#fbf4dc);color:var(--vermilion);border-color:var(--bronze);box-shadow:0 0 14px rgba(138,104,36,.18)}
+  .panel{display:none}
+  .panel.active{display:block;animation:fade .35s ease}
+  @keyframes fade{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+  .err{color:var(--vermilion);background:rgba(168,48,24,.08);border:1px solid rgba(168,48,24,.34);
+    border-radius:8px;padding:12px;font-size:14px;margin-top:14px;display:none}
+  .row{display:flex;gap:12px;flex-wrap:wrap}
+  .row>.col{flex:1;min-width:118px}
+  .sub2{font-size:12px;color:var(--bronze);opacity:.8;margin:10px 0 4px;letter-spacing:1px;font-weight:600}
+  /* 合婚 */
+  .scorebox{text-align:center;padding:18px;border:1px solid color-mix(in srgb,var(--bronze) 30%,transparent);border-radius:14px;background:var(--paper)}
+  .scorebox .num{font-size:46px;font-weight:800;color:var(--vermilion);letter-spacing:1px}
+  .scorebox .lv{font-size:15px;color:var(--bronze);letter-spacing:3px;margin-top:4px}
+  .scorebox .seal{display:inline-block;margin-top:8px;font-size:11px;color:#fff;background:var(--vermilion);padding:2px 12px;border-radius:4px;letter-spacing:2px}
+  .dim{display:flex;gap:10px;flex-wrap:wrap;margin-top:6px}
+  .dcard{flex:1;min-width:150px;background:var(--paper);border:1px solid color-mix(in srgb,var(--bronze) 22%,transparent);border-radius:12px;padding:13px 14px}
+  .dcard .k{font-size:12px;color:var(--bronze);letter-spacing:1px}
+  .dcard .v{font-size:16px;color:var(--ink);font-weight:600;margin:3px 0}
+  .dcard .d{font-size:11.5px;opacity:.72;line-height:1.5}
+  .tagv{font-size:11px;padding:1px 9px;border-radius:12px;letter-spacing:1px}
+  .tagv.g{background:rgba(106,140,106,.18);color:#3f5a3f;border:1px solid rgba(106,140,106,.4)}
+  .tagv.b{background:rgba(168,48,24,.12);color:var(--vermilion);border:1px solid rgba(168,48,24,.4)}
+  .tagv.p{background:rgba(138,104,36,.12);color:var(--bronze);border:1px solid rgba(138,104,36,.4)}
+  /* 人格 */
+  .q{background:var(--paper);border:1px solid color-mix(in srgb,var(--bronze) 22%,transparent);border-radius:12px;padding:14px 16px;margin-bottom:12px}
+  .q .qt{font-size:14px;color:var(--ink);font-weight:600;margin-bottom:10px}
+  .q label{display:block;font-size:13px;color:var(--ink);opacity:.85;padding:7px 10px;border:1px solid color-mix(in srgb,var(--bronze) 24%,transparent);border-radius:8px;cursor:pointer;margin:6px 0}
+  .q label:hover{border-color:var(--bronze)}
+  .q input{width:auto;margin-right:8px}
+  .mbti-out{text-align:center;padding:16px;background:var(--paper);border:1px solid color-mix(in srgb,var(--bronze) 30%,transparent);border-radius:14px}
+  .mbti-out .type{font-size:34px;font-weight:800;color:var(--vermilion);letter-spacing:4px}
+  .mbti-out .desc{font-size:13px;color:var(--ink);opacity:.85;line-height:1.7;margin-top:8px}
+  .note{font-size:12px;opacity:.62;margin-top:8px;line-height:1.55}
+  @media(max-width:680px){ .row>.col{min-width:100%} }
+</style>
+</head>
+<body data-page="hehun">
+<nav class="topnav">
+  <a class="brand" href="index.html">八卦运势<small>Ba Gua Fortune</small></a>
+  <a href="bazi.html">八字</a>
+  <a href="ziwei.html">紫微</a>
+  <a href="meihua.html">梅花</a>
+  <a href="liuyao.html">六爻</a>
+  <a href="tarot.html">塔罗</a>
+  <a href="fengshui.html">风水</a>
+  <a href="hehun.html" class="active">合婚</a>
+</nav>
+
+<div class="wrap">
+  <div class="page-head">
+    <h1>合婚人格</h1>
+    <div class="en">HE HUN · Compatibility &amp; Personality · 米黄古籍</div>
+    <div class="sub">八字合婚（生肖·五行·干合多维打分）· MBTI 人格自评</div>
+  </div>
+
+  <div class="tabs">
+    <div class="tab active" data-tab="he">八字合婚</div>
+    <div class="tab" data-tab="mb">人格自评</div>
+  </div>
+
+  <!-- 合婚 -->
+  <section class="panel active" id="panel-he">
+    <div class="card">
+      <h3>双方出生信息</h3>
+      <div class="sub2">男方</div>
+      <div class="row">
+        <div class="col"><label>年</label><input id="m-y" type="number" value="1990"></div>
+        <div class="col"><label>月</label><input id="m-m" type="number" value="5" min="1" max="12"></div>
+        <div class="col"><label>日</label><input id="m-d" type="number" value="20" min="1" max="31"></div>
+      </div>
+      <div class="row">
+        <div class="col"><label>时(0-23)</label><input id="m-h" type="number" value="10"></div>
+        <div class="col"><label>分</label><input id="m-min" type="number" value="0"></div>
+      </div>
+      <div class="sub2">女方</div>
+      <div class="row">
+        <div class="col"><label>年</label><input id="f-y" type="number" value="1992"></div>
+        <div class="col"><label>月</label><input id="f-m" type="number" value="8" min="1" max="12"></div>
+        <div class="col"><label>日</label><input id="f-d" type="number" value="14" min="1" max="31"></div>
+      </div>
+      <div class="row">
+        <div class="col"><label>时(0-23)</label><input id="f-h" type="number" value="14"></div>
+        <div class="col"><label>分</label><input id="f-min" type="number" value="0"></div>
+      </div>
+      <button class="btn" id="btn-he">合 婚 评 分</button>
+      <div class="err" id="err-he"></div>
+    </div>
+    <div id="he-result"></div>
+  </section>
+
+  <!-- 人格 -->
+  <section class="panel" id="panel-mb">
+    <div class="card">
+      <h3>MBTI 人格自评 <span class="badge">四问速览</span></h3>
+      <div id="mb-quiz"></div>
+      <button class="btn" id="btn-mb">看 我 的 类 型</button>
+      <div class="err" id="err-mb"></div>
+    </div>
+    <div id="mb-result"></div>
+    <div class="note">本测评仅供了解自己的沟通与决策偏好，便于你调整与助手的协作方式（例如告诉助手「我希望你更主动/更直接」）。人格无优劣，仅供参考。</div>
+  </section>
+</div>
+
+<footer class="footer">
+  <div class="disclaimer">⚠️ 以上为玄学体系的传统解读与象征推演，仅供参考。本页由 AI 生成，不构成医疗、法律、财务或投资建议；命理是参考，不是定数。涉及健康、法律、重大财务决策请咨询相应专业人士。</div>
+</footer>
+
+<script src="js-engine/src/data.js"></script>
+<script src="js-engine/src/engine.js"></script>
+<script>
+(function(){
+  "use strict";
+  function $(s){return document.querySelector(s);}
+  function el(t,c,h){var e=document.createElement(t);if(c)e.className=c;if(h!=null)e.innerHTML=h;return e;}
+  var WX={"甲":"木","乙":"木","丙":"火","丁":"火","戊":"土","己":"土","庚":"金","辛":"金","壬":"水","癸":"水",
+    "子":"水","亥":"水","寅":"木","卯":"木","巳":"火","午":"火","申":"金","酉":"金","辰":"土","戌":"土","丑":"土","未":"土"};
+  // tabs
+  document.querySelectorAll(".tab").forEach(function(t){
+    t.addEventListener("click",function(){
+      document.querySelectorAll(".tab").forEach(function(x){x.classList.toggle("active",x===t);});
+      document.querySelectorAll(".panel").forEach(function(p){p.classList.toggle("active",p.id==="panel-"+t.dataset.tab);});
+    });
+  });
+
+  /* ============ 八字合婚 ============ */
+  var LIU_HE=[["子","丑"],["寅","亥"],["卯","戌"],["辰","酉"],["巳","申"],["午","未"]]; // 六合
+  var LIU_CHONG=[["子","午"],["丑","未"],["寅","申"],["卯","酉"],["辰","戌"],["巳","亥"]]; // 六冲
+  var LIU_HAI=[["子","未"],["丑","午"],["寅","巳"],["卯","辰"],["申","亥"],["酉","戌"]]; // 六害
+  var SAN_HE=[["申","子","辰"],["亥","卯","未"],["寅","午","戌"],["巳","酉","丑"]]; // 三合
+  var SAN_XING=[["寅","巳","申"],["丑","戌","未"],["子","卯"],["辰","午","酉","亥"]]; // 三刑
+  var GAN_HE=[["甲","己"],["乙","庚"],["丙","辛"],["丁","壬"],["戊","癸"]]; // 五合
+  function has(pair,arr){return arr.some(function(x){return (x[0]===pair[0]&&x[1]===pair[1])||(x[0]===pair[1]&&x[1]===pair[0]);});}
+  function inTri(z,arr){return arr.some(function(t){return t.indexOf(z)>=0;});}
+  var PRODUCE={"木":"火","火":"土","土":"金","金":"水","水":"木"};
+  var KE={"木":"土","土":"水","水":"火","火":"金","金":"木"};
+
+  function baziOf(y,m,d,h,mi){
+    return BZ.analyzeBazi({year:y,month:m,day:d,hour:h,minute:mi||0,calendar_type:"solar",gender:"male",longitude:120,tz_offset:8,is_leap:false,flow_year:null,age:null});
+  }
+  $("#btn-he").addEventListener("click",function(){
+    var err=$("#err-he");err.style.display="none";err.textContent="";
+    try{
+      var mp=baziOf(+$("#m-y").value,+$("#m-m").value,+$("#m-d").value,+$("#m-h").value,+$("#m-min").value);
+      var fp=baziOf(+$("#f-y").value,+$("#f-m").value,+$("#f-d").value,+$("#f-h").value,+$("#f-min").value);
+      var my=mp.pillars.pillars.year.gz, fy=fp.pillars.pillars.year.gz;
+      var mz=my[1], fz=fy[1]; // 年支
+      var md=mp.pillars.pillars.day.gz[0], fd=fp.pillars.pillars.day.gz[0]; // 日干
+      var mw=WX[md], fw=WX[fd];
+      var mAnimal=mp.pillars.animal, fAnimal=fp.pillars.animal;
+      renderHe({mz,fz,md,fd,mw,fw,mAnimal,fAnimal});
+    }catch(e){err.style.display="block";err.textContent="⚠ "+e.message;}
+  });
+
+  function renderHe(d){
+    var box=$("#he-result");box.innerHTML="";
+    var score=60, dims=[];
+    // 1. 生肖
+    var sheng={txt:"",tag:"p",delta:0};
+    if(has([d.mz,d.fz],LIU_HE)){sheng={txt:"六合（如子丑合、寅亥合）",tag:"g",delta:20};}
+    else if(inTri(d.mz,SAN_HE)&&inTri(d.fz,SAN_HE)&&sameTri(d.mz,d.fz)){sheng={txt:"三合（申子辰/亥卯未/寅午戌/巳酉丑）",tag:"g",delta:14};}
+    else if(has([d.mz,d.fz],LIU_CHONG)){sheng={txt:"六冲（如子午冲、卯酉冲）",tag:"b",delta:-16};}
+    else if(has([d.mz,d.fz],LIU_HAI)){sheng={txt:"六害（如子未害、丑午害）",tag:"b",delta:-10};}
+    else if(inTri(d.mz,SAN_XING)&&inTri(d.fz,SAN_XING)&&sameTri(d.mz,d.fz)){sheng={txt:"三刑（寅巳申/丑戌未/子卯）",tag:"b",delta:-12};}
+    else {sheng={txt:"无特殊刑冲合害，平常论",tag:"p",delta:0};}
+    score+=sheng.delta;
+    dims.push({k:"生肖",v:d.mAnimal+" · "+d.fAnimal,tag:sheng.tag,d:sheng.txt});
+    // 2. 日干五行生克
+    var wx={txt:"",tag:"p",delta:0};
+    if(PRODUCE[d.mw]===d.fw||PRODUCE[d.fw]===d.mw){wx={txt:"日干五行相生（一方生扶一方）",tag:"g",delta:15};}
+    else if(KE[d.mw]===d.fw||KE[d.fw]===d.mw){wx={txt:"日干五行相克（一方克制一方）",tag:"b",delta:-12};}
+    else if(d.mw===d.fw){wx={txt:"日干五行比和（同气相助）",tag:"p",delta:4};}
+    score+=wx.delta;
+    dims.push({k:"日干五行",v:d.md+"("+d.mw+") · "+d.fd+"("+d.fw+")",tag:wx.tag,d:wx.txt});
+    // 3. 天干五合
+    var gh={txt:"",tag:"p",delta:0};
+    if(has([d.md,d.fd],GAN_HE)){gh={txt:"天干五合（甲己/乙庚/丙辛/丁壬/戊癸）",tag:"g",delta:10};}
+    else gh={txt:"无天干五合",tag:"p",delta:0};
+    score+=gh.delta;
+    dims.push({k:"天干",v:d.md+" · "+d.fd,tag:gh.tag,d:gh.txt});
+
+    score=Math.max(0,Math.min(100,score));
+    var lv = score>=80?"上吉":(score>=60?"中和":(score>=40?"需磨合":"多阻滞"));
+    var lvTag = score>=60?"g":"b";
+    var sb=el("div","card");
+    var sc=el("div","scorebox");
+    sc.appendChild(el("div","num",score));
+    sc.appendChild(el("div","lv","综合评分 / 100"));
+    sc.appendChild(el("div","seal",lv));
+    sb.appendChild(sc);
+    box.appendChild(sb);
+
+    var dc=el("div","card");dc.appendChild(el("h3",null,"多维分析"));
+    var dim=el("div","dim");
+    dims.forEach(function(x){
+      var c=el("div","dcard");
+      c.appendChild(el("div","k",x.k));
+      c.appendChild(el("div","v",x.v));
+      c.appendChild(el("span","tagv "+x.tag,x.tag==="g"?"吉":(x.tag==="b"?"凶":"平")));
+      c.appendChild(el("div","d",x.d));
+      dim.appendChild(c);
+    });
+    dc.appendChild(dim);
+    dc.appendChild(el("div","note","评分起底 60，生肖/五行/干合各按吉凶加减，区间 0–100，仅供娱乐参考。婚恋重在相处与沟通，分数之外请以现实为准。"));
+    box.appendChild(dc);
+    box.scrollIntoView({behavior:"smooth",block:"start"});
+  }
+  function sameTri(a,b){return SAN_HE.some(function(t){return t.indexOf(a)>=0&&t.indexOf(b)>=0;});}
+
+  /* ============ MBTI 自评 ============ */
+  var QS=[
+    {k:"E/I",q:"能量来源？",a:["在人群与互动中更有活力（E）","独处与安静中更能充电（I）"]},
+    {k:"S/N",q:"信息偏好？",a:["关注具体事实、经验与细节（S）","关注可能、联想与整体意义（N）"]},
+    {k:"T/F",q:"决策依据？",a:["重逻辑、公平与因果（T）","重人情、和谐与价值（F）"]},
+    {k:"J/P",q:"生活节奏？",a:["喜欢计划、确定与收尾（J）","喜欢弹性、开放与随兴（P）"]}
+  ];
+  var quizBox=$("#mb-quiz");
+  QS.forEach(function(q,i){
+    var card=el("div","q");
+    card.appendChild(el("div","qt",(i+1)+". "+q.q));
+    q.a.forEach(function(opt,j){
+      var lab=el("label",null,null);
+      var inp=el("input");inp.type="radio";inp.name="mb"+i;inp.value=(j===0?q.k[0]:q.k[2]);
+      lab.appendChild(inp);lab.appendChild(document.createTextNode(" "+opt));
+      card.appendChild(lab);
+    });
+    quizBox.appendChild(card);
+  });
+  var DESC={
+    E:"外倾·在互动中蓄能",I:"内倾·在独处中蓄能",S:"实感·立足已知与细节",N:"直觉·看见可能与联结",
+    T:"思辨·以逻辑与公平权衡",F:"共情·以人与价值为准",J:"定力·偏好计划与收束",P:"灵动·偏好弹性与开放"
+  };
+  $("#btn-mb").addEventListener("click",function(){
+    var err=$("#err-mb");err.style.display="none";err.textContent="";
+    try{
+      var letters="";
+      for(var i=0;i<4;i++){
+        var sel=document.querySelector('input[name="mb'+i+'"]:checked');
+        if(!sel)throw new Error("第 "+(i+1)+" 题尚未选择");
+        letters+=sel.value;
+      }
+      var out=el("div","card");
+      var mo=el("div","mbti-out");
+      mo.appendChild(el("div","type",letters));
+      var txt=letters.split("").map(function(c){return DESC[c];}).join("　·　");
+      mo.appendChild(el("div","desc","你的偏好轮廓：<br>"+txt));
+      out.appendChild(mo);
+      out.appendChild(el("div","note","MBTI 描述「偏好」而非能力。若你希望助手更主动/更直接/更简洁，可直接告诉它——它会据此调整沟通风格。"));
+      var box=$("#mb-result");box.innerHTML="";box.appendChild(out);
+      box.scrollIntoView({behavior:"smooth",block:"start"});
+    }catch(e){err.style.display="block";err.textContent="⚠ "+e.message;}
+  });
+})();
+</script>
+</body>
+</html>

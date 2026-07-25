@@ -78,9 +78,22 @@ class Handler(http.server.BaseHTTPRequestHandler):
                 return self._send(200, json.dumps(out, ensure_ascii=False))
             except Exception as e:
                 return self._send(400, json.dumps({"error": str(e)}, ensure_ascii=False))
-        # 其它静态资产（css/js 等）
+        # 其它静态资产（css/js/图片/新页面等），按扩展名给正确 MIME
         if route != "/favicon.ico":
-            return self._static(route.lstrip("/"), "application/octet-stream")
+            _, ext = os.path.splitext(route)
+            ctype = {
+                ".html": "text/html; charset=utf-8",
+                ".css": "text/css; charset=utf-8",
+                ".js": "application/javascript; charset=utf-8",
+                ".json": "application/json; charset=utf-8",
+                ".svg": "image/svg+xml",
+                ".png": "image/png",
+                ".jpg": "image/jpeg",
+                ".jpeg": "image/jpeg",
+                ".ico": "image/x-icon",
+                ".map": "application/json; charset=utf-8",
+            }.get(ext.lower(), "application/octet-stream")
+            return self._static(route.lstrip("/"), ctype)
         self._send(404, json.dumps({"error": "not found"}))
 
     def do_POST(self):
