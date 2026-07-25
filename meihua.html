@@ -42,6 +42,14 @@
   .ty .lv{font-size:14px;padding:3px 14px;border-radius:20px;color:#fff}
   .lv.g{background:#4f8a5a}.lv.x{background:#9a3b2a}.lv.p{background:#8a8a6a}
   .ty .elem{font-size:12px;color:var(--water);opacity:.9}
+  .ty-pair{display:flex;align-items:center;justify-content:center;gap:18px;flex-wrap:wrap;margin:6px 0 12px}
+  .tg{background:var(--paper);border:1px solid color-mix(in srgb,var(--water) 26%,transparent);border-radius:12px;padding:10px 16px;text-align:center;min-width:98px}
+  .tg-role{font-size:12px;color:var(--water);letter-spacing:2px}
+  .tg-sym{font-size:30px;line-height:1.1;color:var(--ink);margin:2px 0}
+  .tg-name{font-size:12px;color:var(--ink);opacity:.8}
+  .tg-elem{display:inline-block;font-size:12px;font-weight:700;padding:1px 12px;border-radius:12px;margin-top:5px}
+  .rel-arrow{font-size:17px;color:var(--water);font-weight:700;letter-spacing:1px}
+  .ty-rel{font-size:13.5px;color:var(--ink);opacity:.86;line-height:1.7;margin-top:6px;text-align:center}
   .note{font-size:12px;opacity:.62;margin-top:8px;line-height:1.55}
   .inline-input{flex:1;min-width:120px}
   @media(max-width:680px){ .hex{min-width:140px} .yao.yang,.yao.yin{width:72px}.yao.yin::before,.yao.yin::after{width:31px} }
@@ -167,6 +175,32 @@
     h.appendChild(el("div","da","大象："+da));
     return h;
   }
+  function trigramChip(role,t,ec){
+    var c=el("div","tg");
+    c.appendChild(el("div","tg-role",role));
+    c.appendChild(el("div","tg-sym",t.sym));
+    c.appendChild(el("div","tg-name",t.name+"·"+t.nature));
+    var e=el("div","tg-elem",t.elem);
+    e.style.background=ec[t.elem]; e.style.color="#1a1a1a";
+    c.appendChild(e);
+    return c;
+  }
+  function relArrow(v){
+    if(v==="用生体")return "← 生";
+    if(v==="体生用")return "→ 生";
+    if(v==="用克体")return "← 克";
+    if(v==="体克用")return "→ 克";
+    return "＝ 比和";
+  }
+  function relSentence(ti,yong,ty){
+    var s="体为"+ti.name+"("+ti.elem+")";
+    if(ty.verdict==="比和") s+=" 与 用"+yong.name+"("+yong.elem+") 比和，平吉无争。";
+    else if(ty.verdict==="用生体") s+="，用为"+yong.name+"("+yong.elem+") 生 体("+ti.elem+")，生我者进益，为吉。";
+    else if(ty.verdict==="体生用") s+="，体("+ti.elem+") 生 用"+yong.name+"("+yong.elem+")，我生者泄气，为小耗。";
+    else if(ty.verdict==="用克体") s+="，用为"+yong.name+"("+yong.elem+") 克 体("+ti.elem+")，克我者受制，为凶。";
+    else s+="，体("+ti.elem+") 克 用"+yong.name+"("+yong.elem+")，我克者得财，为吉。";
+    return s;
+  }
   function render(g){
     var box=$("#meihua-result"); box.innerHTML="";
     // 本卦爻
@@ -189,14 +223,22 @@
 
     // 体用
     var ty=g.ty;
-    var lvcls= ty.level==="吉"?"g":(ty.level==="凶"?"x":"p");
+    var lvcls= ty.level==="凶"?"x":(ty.level==="小耗"?"p":"g");
+    var dongUp=g.dong>=4;
+    var tiNum=dongUp?g.down:g.up, yongNum=dongUp?g.up:g.down;
+    var tiT=MEHUA.TRIGRAM[tiNum], yongT=MEHUA.TRIGRAM[yongNum], ec=MEHUA.ELEM_COLOR;
     var ct=el("div","card"); ct.appendChild(el("h3",null,"体用生克"));
+    var pair=el("div","ty-pair");
+    pair.appendChild(trigramChip("体",tiT,ec));
+    pair.appendChild(el("div","rel-arrow",relArrow(ty.verdict)));
+    pair.appendChild(trigramChip("用",yongT,ec));
+    ct.appendChild(pair);
     var t=el("div","ty");
     t.appendChild(el("div","big",ty.verdict));
     t.appendChild(el("div","lv "+lvcls,ty.level));
-    t.appendChild(el("div","elem",ty.note));
     ct.appendChild(t);
-    ct.appendChild(el("div","note","体为事之主体，用为事之客体。用生体为吉、体克用亦吉；体生用泄气、用克体为凶；比和则平。"));
+    ct.appendChild(el("div","ty-rel",relSentence(tiT,yongT,ty)));
+    ct.appendChild(el("div","note","体为事之主体（静、不变），用为事之客体（动、变）。用生体进益为吉，体生用泄气为耗；用克体受制为凶，体克用亦吉；比和则平吉。"+ty.note+"为体。"));
     box.appendChild(ct);
     box.scrollIntoView({behavior:"smooth",block:"start"});
   }

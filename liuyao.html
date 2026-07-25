@@ -23,13 +23,14 @@
   .yao{display:flex;align-items:center;gap:10px;padding:6px 4px;border-bottom:1px solid color-mix(in srgb,var(--gold) 12%,transparent)}
   .yao:last-child{border-bottom:none}
   .yao.moving{background:color-mix(in srgb,var(--vermilion) 14%,transparent);border-radius:6px}
-  .draw{flex:flex-direction:column;gap:5px;width:120px;flex:0 0 auto}
+  .draw{display:flex;flex-direction:column;gap:5px;width:120px;flex:0 0 auto}
   .bar{height:9px;border-radius:2px;background:var(--ink)}
   .bar.yin{background:transparent;position:relative}
   .bar.yin::before,.bar.yin::after{content:"";position:absolute;top:0;height:9px;background:var(--ink);border-radius:2px}
   .bar.yin::before{left:0;width:52px}.bar.yin::after{right:0;width:52px}
   .yao.moving .bar{background:var(--vermilion)}
   .yao.moving .bar.yin::before,.yao.moving .bar.yin::after{background:var(--vermilion)}
+  .yao.isbian{background:color-mix(in srgb,var(--jade) 12%,transparent);border-radius:6px}
   .info{flex:1;display:flex;gap:6px;align-items:center;flex-wrap:wrap}
   .gz{font-size:15px;color:var(--gold-bright);font-weight:600;letter-spacing:1px}
   .qin{font-size:12px;color:var(--jade);border:1px solid color-mix(in srgb,var(--jade) 45%,transparent);padding:1px 8px;border-radius:12px}
@@ -38,9 +39,18 @@
   .mark.shi{background:var(--vermilion);color:#fff}
   .mark.ying{background:var(--bronze);color:#1a1206}
   .mark.dong{background:var(--gold);color:#1a1206}
+  .mark.bian{background:var(--jade);color:#0e0b06}
   .meta{display:flex;gap:10px;flex-wrap:wrap;margin-top:8px;justify-content:center}
   .meta .m{font-size:12px;color:var(--gold);opacity:.85;letter-spacing:1px}
   .note{font-size:12px;opacity:.62;margin-top:8px;line-height:1.55}
+  .coins{display:flex;gap:14px;justify-content:center;margin-top:14px;height:54px;opacity:0;pointer-events:none;transition:opacity .25s}
+  .coins.on{opacity:1}
+  .coin{width:46px;height:46px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#e8c08a,#c69838 60%,#8a6c3a);
+    color:#1a1206;font-size:20px;font-weight:700;display:flex;align-items:center;justify-content:center;
+    box-shadow:0 2px 8px rgba(0,0,0,.45),inset 0 0 0 2px rgba(255,255,255,.16);font-family:"STKaiti","KaiTi",serif}
+  .coin.spin{animation:coinflip .5s ease-in-out infinite}
+  @keyframes coinflip{0%{transform:rotateY(0) translateY(0)}50%{transform:rotateY(180deg) translateY(-12px)}100%{transform:rotateY(360deg) translateY(0)}}
+  .btn:disabled{opacity:.5;cursor:wait}
   @media(max-width:680px){ .gua{min-width:100%}.draw{width:96px}.bar.yin::before,.bar.yin::after{width:40px} }
 </style>
 </head>
@@ -82,6 +92,7 @@
       </div>
     </div>
     <button class="btn" id="btn-shake">🜆 摇 卦</button>
+    <div class="coins" id="coins" aria-hidden="true"><div class="coin">爻</div><div class="coin">爻</div><div class="coin">爻</div></div>
     <div class="err" id="err-liuyao"></div>
   </div>
 
@@ -101,7 +112,7 @@
 
   // 每爻一行：阳=整条；阴=两断条（用 yin 类断开）
   function yaoRow(line, moving){
-    var row=el("div","yao"+(moving?" moving":""));
+    var row=el("div","yao"+(moving?" moving":"")+(line.isBian?" isbian":""));
     var d=el("div","draw");
     var b=el("div","bar"+(line.yin?" yin":"")); d.appendChild(b);
     row.appendChild(d);
@@ -112,6 +123,7 @@
     if(line.isShi)info.appendChild(el("span","mark shi","世"));
     if(line.isYing)info.appendChild(el("span","mark ying","应"));
     if(line.moving)info.appendChild(el("span","mark dong","动"));
+    if(line.isBian)info.appendChild(el("span","mark bian","变"));
     row.appendChild(info);
     return row;
   }
@@ -131,7 +143,7 @@
     wrap.appendChild(renderGua("本卦", r.ben, r.lines));
     if(r.hasMoving){
       // 变卦 lines：取本卦 lines 但 yin 在动爻处翻转，moving 置 false
-      var bl=r.lines.map(function(l){ return {gz:l.gz,zhi:l.zhi,zhiElem:l.zhiElem,yin:l.moving?!l.yin:l.yin,type:l.type,moving:false,qin:l.qin,god:l.god,isShi:l.isShi,isYing:l.isYing}; });
+      var bl=r.lines.map(function(l){ return {gz:l.gz,zhi:l.zhi,zhiElem:l.zhiElem,yin:l.moving?!l.yin:l.yin,type:l.type,moving:false,isBian:l.moving,qin:l.qin,god:l.god,isShi:l.isShi,isYing:l.isYing}; });
       wrap.appendChild(renderGua("变卦", r.bian, bl));
     }
     cg.appendChild(wrap);
@@ -150,12 +162,21 @@
 
   $("#btn-shake").addEventListener("click",function(){
     var err=$("#err-liuyao"); err.style.display="none"; err.textContent="";
-    try{
-      var yaos=LIuyao.shake();
-      var dg=+$("#lg-daygan").value;
-      var r=LIuyao.analyze(yaos, dg);
-      render(r);
-    }catch(e){ err.style.display="block"; err.textContent="⚠ "+e.message; }
+    var coins=$("#coins"), btn=$("#btn-shake");
+    coins.classList.add("on");
+    [].forEach.call(coins.children,function(c){ c.classList.add("spin"); });
+    btn.disabled=true;
+    setTimeout(function(){
+      try{
+        var yaos=LIuyao.shake();
+        var dg=+$("#lg-daygan").value;
+        var r=LIuyao.analyze(yaos, dg);
+        render(r);
+      }catch(e){ err.style.display="block"; err.textContent="⚠ "+e.message; }
+      coins.classList.remove("on");
+      [].forEach.call(coins.children,function(c){ c.classList.remove("spin"); });
+      btn.disabled=false;
+    }, 900);
   });
 })();
 </script>

@@ -19,11 +19,14 @@
   .chk input{width:auto;margin:0}
   /* 牌阵 */
   .spread-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(175px,1fr));gap:14px}
-  .tcard{background:linear-gradient(180deg,rgba(74,42,106,.42),rgba(26,17,51,.6));
-    border:1px solid color-mix(in srgb,var(--gold) 34%,transparent);border-radius:14px;
-    padding:14px 13px;display:flex;flex-direction:column;gap:8px;position:relative;transition:.18s}
-  .tcard:hover{border-color:var(--gold);box-shadow:0 0 18px rgba(212,175,55,.22)}
-  .tcard.rev{filter:hue-rotate(0);border-color:color-mix(in srgb,var(--red) 42%,transparent)}
+  .tcard{perspective:1000px;background:transparent;border:none;padding:0;position:relative}
+  .tcard-inner{position:relative;width:100%;transform-style:preserve-3d;transition:transform .6s cubic-bezier(.4,.2,.2,1);transform:rotateY(180deg)}
+  .tcard-inner.flipped{transform:rotateY(0deg)}
+  .tcard-face{backface-visibility:hidden;-webkit-backface-visibility:hidden;border-radius:14px;padding:14px 13px;display:flex;flex-direction:column;gap:8px}
+  .tcard-face.front{position:relative;background:linear-gradient(180deg,rgba(74,42,106,.42),rgba(26,17,51,.6));border:1px solid color-mix(in srgb,var(--gold) 34%,transparent)}
+  .tcard-face.back{position:absolute;inset:0;transform:rotateY(180deg);align-items:center;justify-content:center;background:linear-gradient(180deg,#3a2360,#1a1133);border:1px solid color-mix(in srgb,var(--gold) 50%,transparent);color:var(--gold);font-size:15px;letter-spacing:4px}
+  .tcard:hover .tcard-face.front{box-shadow:0 0 18px rgba(212,175,55,.22)}
+  .tcard.rev .tcard-face.front{border-color:color-mix(in srgb,var(--red) 42%,transparent)}
   .tpos{font-size:12.5px;color:var(--gold-bright);letter-spacing:1px;font-weight:600;border-bottom:1px solid color-mix(in srgb,var(--gold) 22%,transparent);padding-bottom:7px}
   .tpos .pdesc{display:block;font-size:10.5px;color:var(--ink);opacity:.6;font-weight:400;letter-spacing:0;margin-top:2px}
   .tface{text-align:center;padding:8px 0}
@@ -111,17 +114,23 @@
       if(!d){ return; }
       var card=d.card;
       var tc=el("div","tcard"+(d.reversed?" rev":""));
-      tc.appendChild(el("div","ttype",card.type==="major"?"大阿尔卡那":"小阿尔卡那"));
-      var pos=el("div","tpos",p.label);
-      pos.appendChild(el("span","pdesc",p.desc));
-      tc.appendChild(pos);
+      var inner=el("div","tcard-inner");
+      inner.appendChild(el("div","tcard-face back","✶ 塔 罗 ✶"));
+      var front=el("div","tcard-face front");
+      front.appendChild(el("div","ttype",card.type==="major"?"大阿尔卡那":"小阿尔卡那"));
+      var posd=el("div","tpos",p.label);
+      posd.appendChild(el("span","pdesc",p.desc));
+      front.appendChild(posd);
       var face=el("div","tface");
-      face.appendChild(el("div","tname",card.cn||(card.num?"":"牌")));
+      face.appendChild(el("div","tname",card.cn||"牌"));
       face.appendChild(el("div","ten",card.en||""));
-      face.appendChild(el("div","torient "+(d.reversed?"dn":"up"),d.reversed?"逆位":"正位"));
-      tc.appendChild(face);
-      tc.appendChild(el("div","tmean",d.meaning||""));
+      face.appendChild(el("div","torient "+(d.reversed?"dn":"up"),d.reversed?"↻ 逆位":"正位"));
+      front.appendChild(face);
+      front.appendChild(el("div","tmean",d.meaning||""));
+      inner.appendChild(front);
+      tc.appendChild(inner);
       grid.appendChild(tc);
+      setTimeout(function(){ inner.classList.add("flipped"); }, 140 + i*160);
     });
     c.appendChild(grid);
     c.appendChild(el("div","note","塔罗以意象与直觉为引，以上为牌义参考。同一组牌在不同心境下会浮现不同讯息，请以自己的感受为最终判准。"));
