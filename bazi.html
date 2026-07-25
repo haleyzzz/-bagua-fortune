@@ -34,6 +34,12 @@
     border-radius:8px;padding:8px 4px}
   .wxitem .w{font-size:13px;color:var(--gold)}
   .wxitem .n{font-size:20px;color:var(--gold-bright);font-weight:600}
+  .wxstack{display:flex;height:24px;border-radius:7px;overflow:hidden;margin:12px 0 8px;border:1px solid color-mix(in srgb,var(--gold) 22%,transparent)}
+  .wxseg{flex:0 0 auto;display:flex;align-items:center;justify-content:center;font-size:11px;color:#0e0b08;font-weight:700;min-width:0;overflow:hidden}
+  .wxseg.zero{background:rgba(236,228,211,.05)}
+  .wxseg.w{background:#4a7fb0}.wxseg.h{background:#c44a3c}.wxseg.t{background:#b8893a}.wxseg.j{background:#d4af6e}.wxseg.s{background:#6b9a5c}
+  .wxseg .lab{font-size:10px;opacity:.92}
+  .shen-mini{font-size:11px;color:var(--gold-bright);opacity:.9;margin-top:5px;border:1px solid color-mix(in srgb,var(--gold) 30%,transparent);border-radius:10px;display:inline-block;padding:1px 8px}
   /* 大运 */
   .dayun-seq{display:flex;gap:8px;overflow-x:auto;padding-bottom:6px}
   .du{flex:0 0 auto;text-align:center;background:#0c0905;border:1px solid color-mix(in srgb,var(--gold) 22%,transparent);
@@ -209,12 +215,16 @@
     var c1=el("div","card"); c1.appendChild(el("h3",null,"四柱八字"));
     var grid=el("div","pillars");
     var defs=[["年柱",P.year,"年"],["月柱",P.month,"月"],["日柱",P.day,"日"],["时柱",P.hour,"时"]];
-    defs.forEach(function(d){
+    defs.forEach(function(d,idx){
       var col=el("div","zhcol");
       col.appendChild(el("div","label",d[0]));
       col.appendChild(el("div","gz",d[1].gz));
       col.appendChild(el("div","wx",(WX[d[1].gz[0]]||"")+(WX[d[1].gz[1]]||"")));
       col.appendChild(el("div","sub","天干 "+WX[d[1].gz[0]]+" · 地支 "+WX[d[1].gz[1]]));
+      if(r.liunian){
+        var sh = idx===2 ? {十神:"日主"} : r.liunian[["year_shen","month_shen","day_shen","hour_shen"][idx]];
+        if(sh && sh.十神) col.appendChild(el("div","shen-mini",sh.十神));
+      }
       grid.appendChild(col);
     });
     c1.appendChild(grid);
@@ -236,6 +246,21 @@
       bar.appendChild(it);
     });
     cw.appendChild(bar);
+    // 五行占比条
+    var total=0; ["木","火","土","金","水"].forEach(function(k){total+=count[k];});
+    var WXCLS={"木":"s","火":"h","土":"t","金":"j","水":"w"};
+    var stack=el("div","wxstack");
+    ["木","火","土","金","水"].forEach(function(k){
+      var pct= total? Math.round(count[k]/total*100):0;
+      var seg=el("div","wxseg "+(count[k]===0?"zero ":WXCLS[k]));
+      seg.style.width=pct+"%";
+      seg.title=k+" "+count[k]+" ("+pct+"%)";
+      if(pct>=9) seg.appendChild(el("span","lab",k+(count[k]?count[k]:"")));
+      stack.appendChild(seg);
+    });
+    cw.appendChild(stack);
+    var miss=["木","火","土","金","水"].filter(function(k){return count[k]===0;});
+    if(miss.length) cw.appendChild(el("div","note","五行缺失："+miss.join("、")+"。（仅就四柱干支而论，大运流年可补；日主为 "+WX[P.day.gz[0]]+"，以五行平衡与喜用为调候方向。）"));
     box.appendChild(cw);
 
     // 大运

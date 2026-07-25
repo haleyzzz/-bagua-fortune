@@ -160,9 +160,10 @@
       var my=mp.pillars.pillars.year.gz, fy=fp.pillars.pillars.year.gz;
       var mz=my[1], fz=fy[1]; // 年支
       var md=mp.pillars.pillars.day.gz[0], fd=fp.pillars.pillars.day.gz[0]; // 日干
+      var mzd=mp.pillars.pillars.day.gz[1], fzd=fp.pillars.pillars.day.gz[1]; // 日支（夫妻宫）
       var mw=WX[md], fw=WX[fd];
       var mAnimal=mp.pillars.animal, fAnimal=fp.pillars.animal;
-      renderHe({mz,fz,md,fd,mw,fw,mAnimal,fAnimal});
+      renderHe({mz,fz,md,fd,mzd,fzd,mw,fw,mAnimal,fAnimal});
     }catch(e){err.style.display="block";err.textContent="⚠ "+e.message;}
   });
 
@@ -193,6 +194,17 @@
     score+=gh.delta;
     dims.push({k:"天干",v:d.md+" · "+d.fd,tag:gh.tag,d:gh.txt});
 
+    // 4. 夫妻宫（日支）刑冲合害 —— 合婚核心
+    var fg={txt:"",tag:"p",delta:0};
+    if(has([d.mzd,d.fzd],LIU_HE)){fg={txt:"夫妻宫六合（日支相合，情投意合）",tag:"g",delta:16};}
+    else if(inTri(d.mzd,SAN_HE)&&inTri(d.fzd,SAN_HE)&&sameTri(d.mzd,d.fzd)){fg={txt:"夫妻宫三合（日支同局，互助相生）",tag:"g",delta:12};}
+    else if(has([d.mzd,d.fzd],LIU_CHONG)){fg={txt:"夫妻宫六冲（日支相冲，需多磨合）",tag:"b",delta:-12};}
+    else if(has([d.mzd,d.fzd],LIU_HAI)){fg={txt:"夫妻宫六害（日支相害，易生隔阂）",tag:"b",delta:-8};}
+    else if(inTri(d.mzd,SAN_XING)&&inTri(d.fzd,SAN_XING)&&sameTri(d.mzd,d.fzd)){fg={txt:"夫妻宫三刑（日支相刑，多摩擦）",tag:"b",delta:-10};}
+    else {fg={txt:"夫妻宫无特殊刑冲合害，平常论",tag:"p",delta:0};}
+    score+=fg.delta;
+    dims.push({k:"夫妻宫",v:d.md+d.mzd+" · "+d.fd+d.fzd,tag:fg.tag,d:fg.txt});
+
     score=Math.max(0,Math.min(100,score));
     var lv = score>=80?"上吉":(score>=60?"中和":(score>=40?"需磨合":"多阻滞"));
     var lvTag = score>=60?"g":"b";
@@ -201,6 +213,7 @@
     sc.appendChild(el("div","num",score));
     sc.appendChild(el("div","lv","综合评分 / 100"));
     sc.appendChild(el("div","seal",lv));
+    sc.appendChild(el("div","sub2","男 "+d.md+d.mzd+"　女 "+d.fd+d.fzd));
     sb.appendChild(sc);
     box.appendChild(sb);
 
@@ -215,7 +228,7 @@
       dim.appendChild(c);
     });
     dc.appendChild(dim);
-    dc.appendChild(el("div","note","评分起底 60，生肖/五行/干合各按吉凶加减，区间 0–100，仅供娱乐参考。婚恋重在相处与沟通，分数之外请以现实为准。"));
+    dc.appendChild(el("div","note","评分起底 60，四维（生肖·日干五行·天干五合·夫妻宫日支）各按吉凶加减，区间 0–100，仅供娱乐参考。婚恋重在相处与沟通，分数之外请以现实为准。"));
     box.appendChild(dc);
     box.scrollIntoView({behavior:"smooth",block:"start"});
   }

@@ -26,26 +26,31 @@
   /* 九宫 */
   .luo{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;max-width:440px;margin:6px auto 0}
   .cell9{background:var(--panel);border:1px solid color-mix(in srgb,var(--jade) 24%,transparent);
-    border-radius:12px;padding:12px 8px;text-align:center;min-height:96px}
+    border-radius:12px;padding:11px 7px;text-align:center;min-height:124px}
   .cell9 .dir{font-size:11px;color:var(--bronze);letter-spacing:1px}
-  .cell9 .nums{display:flex;flex-direction:column;gap:3px;margin-top:6px}
-  .nline{display:flex;justify-content:center;gap:6px;font-size:16px;color:var(--ink)}
-  .nl{font-size:11px;color:var(--jade);opacity:.7;width:18px;text-align:right}
+  .cell9 .nums{display:flex;flex-direction:column;gap:2px;margin-top:5px}
+  .nline{display:flex;justify-content:center;gap:6px;font-size:15px;color:var(--ink)}
+  .nl{font-size:10.5px;color:var(--jade);opacity:.7;width:18px;text-align:right}
   .nnum{font-weight:600;color:var(--gold-bright)}
+  .nnum.big{font-size:20px;color:var(--gold-bright);text-shadow:0 0 8px rgba(224,181,85,.35)}
   .nstar.big{font-size:22px;color:var(--gold-bright)}
   .luck{font-size:10.5px;margin-top:5px;padding:1px 8px;border-radius:12px;display:inline-block}
-  .luck.wang{background:rgba(224,181,85,.18);color:var(--gold-bright);border:1px solid rgba(224,181,85,.5)}
-  .luck.sheng{background:rgba(109,203,191,.16);color:var(--jade);border:1px solid rgba(109,203,191,.45)}
-  .luck.tui{background:rgba(184,168,120,.12);color:var(--bronze);border:1px solid rgba(184,168,120,.4)}
+  .luck.wang{background:rgba(224,181,85,.2);color:var(--gold-bright);border:1px solid rgba(224,181,85,.55)}
+  .luck.sheng{background:rgba(109,203,191,.18);color:var(--jade);border:1px solid rgba(109,203,191,.5)}
+  .luck.tui{background:rgba(216,88,72,.14);color:var(--red);border:1px solid rgba(216,88,72,.45)}
   .luck.zhi{font-size:13px;background:rgba(109,203,191,.12);color:var(--jade);border:1px solid rgba(109,203,191,.3)}
   /* 奇门星门神 */
   .qcell{background:var(--panel);border:1px solid color-mix(in srgb,var(--jade) 24%,transparent);
-    border-radius:10px;padding:9px 6px;text-align:center;min-height:92px}
-  .qcell.zf{background:linear-gradient(180deg,rgba(224,181,85,.16),var(--panel));border-color:var(--gold)}
+    border-radius:10px;padding:8px 6px;text-align:center;min-height:104px}
+  .qcell.zf{background:linear-gradient(180deg,rgba(224,181,85,.18),var(--panel));border-color:var(--gold);box-shadow:0 0 14px rgba(224,181,85,.2)}
   .qcell .gno{font-size:11px;color:var(--bronze)}
-  .qcell .qx{font-size:14px;color:var(--gold-bright);font-weight:600;margin:3px 0}
-  .qcell .qi{font-size:11.5px;color:var(--ink);line-height:1.5}
+  .qcell .gno .zf-badge{color:var(--gold-bright);font-weight:700;margin-left:3px}
+  .qcell .qx{font-size:15px;color:var(--gold-bright);font-weight:600;margin:2px 0}
+  .qcell .qi{font-size:11.5px;color:var(--ink);line-height:1.6}
   .qcell .qi b{color:var(--jade);font-weight:400}
+  .m-g{color:var(--jade);font-weight:600}
+  .m-b{color:var(--red);font-weight:600}
+  .m-p{color:var(--bronze)}
   /* 择吉列表 */
   .rilist{display:flex;flex-direction:column;gap:8px}
   .ri{background:var(--panel);border:1px solid color-mix(in srgb,var(--jade) 20%,transparent);
@@ -193,6 +198,12 @@
     if(n>=3&&n<=8)return {cls:"tui",txt:"退气"};
     return {cls:"tui",txt:"中"};
   }
+  // 八门吉凶配色：开/休/生 吉，死/惊 凶，余平
+  function doorClass(m){
+    if(m==="开"||m==="休"||m==="生")return "m-g";
+    if(m==="死"||m==="惊")return "m-b";
+    return "m-p";
+  }
   function renderLuo(panGetter, bigKey){
     var grid=el("div","luo");
     LUO.forEach(function(g){
@@ -207,9 +218,9 @@
         nums.appendChild(line);
       });
       c.appendChild(nums);
-      // 吉凶标记用山星
-      var lk=luck(panGetter(g)[1].n);
-      c.appendChild(el("span","luck "+lk.cls,lk.txt));
+      // 吉凶标记用向星（向盘主财事，问事多用向）
+      var lk=luck(panGetter(g)[2].n);
+      c.appendChild(el("span","luck "+lk.cls,"向·"+lk.txt));
       grid.appendChild(c);
     });
     return grid;
@@ -228,12 +239,13 @@
       var grid=renderLuo(function(g){
         return [
           {l:"运",n:fx.yunPan[g]},
-          {l:"山",n:fx.shanPan[g],big:true},
-          {l:"向",n:fx.xiangPan[g]}
+          {l:"山",n:fx.shanPan[g]},
+          {l:"向",n:fx.xiangPan[g],big:true},
+          {l:"年",n:fx.yearPan[g]}
         ];
       });
       c.appendChild(grid);
-      c.appendChild(el("div","note","三盘：运盘（中宫入运星顺飞）、山盘（坐山宫运星入中，依天/人/地元龙阴阳顺逆飞）、向盘（朝向宫运星入中）。年星"+fx.yearStar+"入中顺飞。下方标记以山星论旺/生气/退气（下元九运简化），实际吉凶须合峦头形势，仅作参考。"));
+      c.appendChild(el("div","note","四盘：运盘（当运星入中顺飞）、山盘（坐山宫运星入中，依元龙阴阳顺逆飞）、向盘（朝向宫运星入中）、年星（"+fx.yearStar+"入中顺飞，主流年气运）。每宫「向·旺/生气/退气」以向星论（向盘主财事，下元九运简化：9 当旺、1/2 生气、余退气）。实际吉凶须合峦头形势，仅作参考。"));
       box.appendChild(c);
     }catch(e){err.style.display="block";err.textContent="⚠ "+e.message;}
   });
@@ -257,15 +269,16 @@
       var grid=el("div","luo");
       LUO.forEach(function(g){
         var cc=el("div","qcell"+(g===q.zhiGong?" zf":""));
-        cc.appendChild(el("div","gno",GONG_NAME[g]));
+        cc.appendChild(el("div","gno",GONG_NAME[g]+(g===q.zhiGong?"<span class='zf-badge'>·值符</span>":"")));
         cc.appendChild(el("div","qx",(q.tian[g]||"").replace("天","")));
         var qi=el("div","qi");
-        qi.innerHTML="<b>门</b> "+(q.men[g]||"")+"　<b>神</b> "+(q.shen[g]||"");
+        var mc=doorClass(q.men[g]);
+        qi.innerHTML="<b>干</b> "+(q.di[g]||"")+"　<b>门</b> <span class='"+mc+"'>"+(q.men[g]||"")+"</span>　<b>神</b> "+(q.shen[g]||"");
         cc.appendChild(qi);
         grid.appendChild(cc);
       });
       c.appendChild(grid);
-      c.appendChild(el("div","note","九宫三层：星（天盘九星）、门（八门）、神（八神）。值符落宫以金框标出。奇门重在用神与格局，此盘供初步排布参考，实际应用请结合问事用神与专业判断。"));
+      c.appendChild(el("div","note","九宫四层：干（地盘六仪三奇 戊己庚辛壬癸丁丙乙）、星（天盘九星）、门（八门，绿=开/休/生吉，红=死/惊凶，余平）、神（八神）。值符落宫以金框＋「值符」标出。奇门重在用神与格局，此盘供初步排布参考，实际应用请结合问事用神与专业判断。"));
       box.appendChild(c);
     }catch(e){err.style.display="block";err.textContent="⚠ "+e.message;}
   });
