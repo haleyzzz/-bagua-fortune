@@ -132,6 +132,14 @@
       </div>
       <div class="col"><label>当前年龄(可选)</label><input id="zage" type="number" value="36" min="0"></div>
       <div class="col"><label>流年年份(可选)</label><input id="zln" type="number" value="2026" min="1900" max="2100"></div>
+      <div class="col"><label>农历月份(流月)</label><select id="zlm">
+        <option value="1">正月(寅)</option><option value="2">二月(卯)</option>
+        <option value="3">三月(辰)</option><option value="4">四月(巳)</option>
+        <option value="5">五月(午)</option><option value="6">六月(未)</option>
+        <option value="7">七月(申)</option><option value="8">八月(酉)</option>
+        <option value="9">九月(戌)</option><option value="10">十月(亥)</option>
+        <option value="11">冬月(子)</option><option value="12">腊月(丑)</option>
+      </select></div>
     </div>
     <button class="btn" id="btn-ziwei">排 盘</button>
     <div class="err" id="err-ziwei"></div>
@@ -162,6 +170,8 @@
     "庚":["太阳","武曲","太阴","天同"], "辛":["巨门","太阳","文曲","文昌"],
     "壬":["天梁","紫微","左辅","武曲"], "癸":["破军","巨门","太阴","贪狼"]
   };
+  // 五虎遁：流年天干 -> 正月(寅月)天干（甲己→丙、乙庚→戊、丙辛→庚、丁壬→壬、戊癸→甲）
+  var TIGER={"甲":"丙","己":"丙","乙":"戊","庚":"戊","丙":"庚","辛":"庚","丁":"壬","壬":"壬","戊":"甲","癸":"甲"};
 
   // 星点背景
   (function(){
@@ -191,6 +201,10 @@
     if(C['财帛']&&C['迁移']) ln(C['财帛'],C['迁移']);
   }
   var _sfT; addEventListener('resize',function(){clearTimeout(_sfT);_sfT=setTimeout(drawSanFang,160);});
+
+  // 流月默认当前公历月份（农历月近似，用户可微调）；变更即重排
+  try{ $("#zlm").value=Math.min(12,new Date().getMonth()+1); }catch(e){}
+  $("#zlm").addEventListener("change",function(){ if($("#ziwei-result").children.length) $("#btn-ziwei").click(); });
 
   $("#btn-ziwei").addEventListener("click",function(){
     var err=$("#err-ziwei");err.style.display="none";err.textContent="";
@@ -345,6 +359,57 @@
     cl.appendChild(sg2);
     cl.appendChild(el("div","note","流年命宫 = 当年太岁（"+lnGan+lnZhi+"）所落之宫；其三方四正（财帛·官禄·迁移）为当年重点宫位。流年四化依流年天干（"+lnGan+"干）推导，与本命四化叠加参看，吉凶以实际星曜庙旺落陷为断。"));
     box.appendChild(cl);
+
+    // 5) 流月（年盘流月法：以流年命宫为基，正月顺数；流月天干走五虎遁）
+    var lmMonth=+$("#zlm").value||1;
+    var lmGan0=TIGER[lnGan]||"丙";
+    var lmGan=GAN[(GAN.indexOf(lmGan0)+(lmMonth-1))%10];
+    var lmZhi=ZHI[(ZHI.indexOf("寅")+(lmMonth-1))%12];
+    var lmMing=null,lmSF=new Set();
+    if(lnMing){
+      var ci2=ZW_ORDER.indexOf(lnMing.name);
+      lmMing=sorted[(ci2+(lmMonth-1))%12];
+      var ci3=ZW_ORDER.indexOf(lmMing.name);
+      [4,6,8].forEach(function(o){ lmSF.add(sorted[(ci3+o)%12].name); });
+    }
+    var lmActs={禄:[],权:[],科:[],忌:[]};
+    if(GAN4[lmGan]){
+      var sf4b=GAN4[lmGan];
+      ["禄","权","科","忌"].forEach(function(t,i){
+        var star=sf4b[i];
+        a.palaces.forEach(function(p){
+          (p.majorStars||[]).forEach(function(s){ if(s.name===star) lmActs[t].push(star+"→"+p.name); });
+        });
+      });
+    }
+    var cm=el("div","card ln-card");
+    cm.appendChild(el("h3",null,"流月 · 农历"+lmMonth+"月（"+lmGan+lmZhi+"月）"+(lmMing?("　流月命宫："+lmMing.name+" "+lmMing.heavenlyStem+lmMing.earthlyBranch):"")));
+    if(lmMing){
+      var gpm=el("div","gp");
+      var lmSet=new Set(lmSF); lmSet.add(lmMing.name);
+      lmSet.forEach(function(nm3){
+        var pp2=sorted.filter(function(x){return x.name===nm3;})[0];
+        var g=el("div","g");
+        g.appendChild(el("div","nm",(pp2===lmMing?"流月命宫 · ":"流月 · ")+pp2.name));
+        var sts2=(pp2.majorStars||[]).map(function(s){return s.name;}).join("、")||"—";
+        g.appendChild(el("div","st",sts2));
+        gpm.appendChild(g);
+      });
+      cm.appendChild(gpm);
+    }
+    var sg3=el("div","sx-grid");
+    ["禄","权","科","忌"].forEach(function(t){
+      var sx=el("div","sx "+t);
+      sx.appendChild(el("div","t",t));
+      var arr=lmActs[t];
+      sx.appendChild(el("div","star",arr[0]?arr[0].split("→")[0]:"—"));
+      sx.appendChild(el("div","to",arr[0]?arr[0].split("→")[1]+"宫":"—"));
+      sg3.appendChild(sx);
+    });
+    cm.appendChild(sg3);
+    cm.appendChild(el("div","note","流月依『年盘流月』法：以流年命宫（太岁宫）为基准，正月起于该宫，顺时针数至所选农历月，得流月命宫及其三方四正。流月天干由流年天干起五虎遁（甲己→丙寅、乙庚→戊寅、丙辛→庚寅、丁壬→壬寅、戊癸→甲寅）推得，流月四化据此推导。此为传统规则的简化演绎，不同流派（如月盘起法、闰月处理）略有出入，吉凶仍以本命星曜庙旺落陷为准。"));
+    box.appendChild(cm);
+
     box.scrollIntoView({behavior:"smooth",block:"start"});
   }
 })();
