@@ -109,6 +109,13 @@
     return hexagramOf(yb);
   }
 
+  // 互卦（互体）：取本卦二三四爻为下互、三四五爻为上互，得隐藏之卦
+  function hugua(yaos) {
+    var down = trigramFromYao(!yaos[1].yin, !yaos[2].yin, !yaos[3].yin); // 二三四
+    var up = trigramFromYao(!yaos[2].yin, !yaos[3].yin, !yaos[4].yin);   // 三四五
+    return { up: up, down: down, idx: (up - 1) * 8 + (down - 1), name: HEX_NAME[(up - 1) * 8 + (down - 1)] };
+  }
+
   function analyze(yaos, dayGanIdx) {
     dayGanIdx = (dayGanIdx == null) ? (new Date().getFullYear() + new Date().getDate()) % 10 : dayGanIdx % 10;
     var ben = hexagramOf(yaos);
@@ -149,7 +156,7 @@
   var API = {
     HEX_NAME: HEX_NAME, NAJIA: NAJIA, SHEN: SHEN, TRIGRAM_ELEM: TRIGRAM_ELEM,
     shake: shake, analyze: analyze, upDownOf: upDownOf,
-    hexagramOf: hexagramOf, changedHexagram: changedHexagram
+    hexagramOf: hexagramOf, changedHexagram: changedHexagram, hugua: hugua
   };
   global.LIuyao = API;
   if (typeof module !== 'undefined' && module.exports) module.exports = API;

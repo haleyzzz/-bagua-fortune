@@ -62,7 +62,25 @@
   .jing .jtxt{flex:1;font-size:13.5px;color:var(--ink);line-height:1.7;font-family:"STKaiti","KaiTi",serif}
   .jing .jqin{color:var(--jade)}
   .jing .note{font-size:12px;opacity:.6;margin-top:10px;line-height:1.6}
-  @media(max-width:680px){ .gua{min-width:100%}.draw{width:96px}.bar.yin::before,.bar.yin::after{width:40px}.jing .jtag{min-width:84px} }
+  /* 迷你卦（互卦绘制） */
+  .gua-mini{flex:0 0 auto;background:var(--paper);border:1px solid color-mix(in srgb,var(--gold) 22%,transparent);border-radius:12px;padding:12px 10px;text-align:center}
+  .gua-mini .gm-name{font-size:13px;color:var(--gold-bright);font-weight:700;letter-spacing:1px;margin-bottom:8px}
+  .gua-mini .gm-yao{display:flex;flex-direction:column;gap:4px;align-items:center}
+  .gua-mini .gm-bar{height:7px;width:84px;background:var(--ink);border-radius:2px}
+  .gua-mini .gm-bar.yin{background:transparent;position:relative}
+  .gua-mini .gm-bar.yin::before,.gua-mini .gm-bar.yin::after{content:"";position:absolute;top:0;height:7px;background:var(--ink);border-radius:2px}
+  .gua-mini .gm-bar.yin::before{left:0;width:36px}.gua-mini .gm-bar.yin::after{right:0;width:36px}
+  /* 经文分段 / 综合参断 */
+  .jing .jsec{padding:11px 0;border-bottom:1px dashed color-mix(in srgb,var(--gold) 18%,transparent)}
+  .jing .jsec:last-child{border-bottom:none}
+  .jing .jtxt{margin:3px 0;font-size:13.5px;color:var(--ink);line-height:1.7;font-family:"STKaiti","KaiTi",serif}
+  .jing .jtuan{opacity:.92}
+  .jing .jdaxiang{opacity:.82}
+  .syn .srow{display:flex;gap:12px;padding:9px 0;border-bottom:1px dashed color-mix(in srgb,var(--gold) 18%,transparent)}
+  .syn .srow:last-child{border-bottom:none}
+  .syn .stag{flex:0 0 auto;font-size:13px;color:var(--vermilion);font-weight:700;min-width:84px}
+  .syn .stxt{flex:1;font-size:13.5px;color:var(--ink);line-height:1.7;font-family:"STKaiti","KaiTi",serif}
+  @media(max-width:680px){ .gua{min-width:100%}.draw{width:96px}.bar.yin::before,.bar.yin::after{width:40px}.jing .jtag{min-width:84px}.gua-mini .gm-bar{width:70px}.gua-mini .gm-bar.yin::before,.gua-mini .gm-bar.yin::after{width:30px} }
 </style>
 </head>
 <body data-page="liuyao">
@@ -148,13 +166,78 @@
     }
     return g;
   }
-  function render(r){
+  // 八纯卦线型（自底向上：1=阳 0=阴）— 用于迷你卦/互卦绘制
+  var TRIGRAM_LINES = { 1:[1,1,1], 2:[1,1,0], 3:[1,0,1], 4:[1,0,0], 5:[0,1,1], 6:[0,1,0], 7:[0,0,1], 8:[0,0,0] };
+  function hexLines(idx){ var up=((idx/8)|0)+1, down=(idx%8)+1; return TRIGRAM_LINES[down].concat(TRIGRAM_LINES[up]); }
+  function miniGua(title, idx){
+    var g=el("div","gua-mini");
+    g.appendChild(el("div","gm-name", title+"　"+LIuyao.HEX_NAME[idx]));
+    var wrap=el("div","gm-yao"); var lines=hexLines(idx);
+    for(var i=5;i>=0;i--){ wrap.appendChild(el("div","gm-bar"+(lines[i]?"":" yin"))); }
+    g.appendChild(wrap); return g;
+  }
+  function jsec(title, guaci, tuan, daxiang){
+    var sec=el("div","jsec");
+    sec.appendChild(el("div","jtag t", title));
+    var bd=el("div");
+    bd.appendChild(el("div","jtxt","卦辞：「"+guaci+"」"));
+    bd.appendChild(el("div","jtxt jtuan","彖传：「"+tuan+"」"));
+    bd.appendChild(el("div","jtxt jdaxiang","大象：「"+daxiang+"」"));
+    sec.appendChild(bd); return sec;
+  }
+  function srow(tag, txt){ var r=el("div","srow"); r.appendChild(el("div","stag",tag)); r.appendChild(el("div","stxt",txt)); return r; }
+  var KE={"木":"土","土":"水","水":"火","火":"金","金":"木"}, PRODUCE={"木":"火","火":"土","土":"金","金":"水","水":"木"};
+  function relTo(shi, l){
+    var sE=shi.zhiElem, lE=l.zhiElem;
+    if(lE===sE) return "比和（同我），事多平顺、彼此助力。";
+    if(PRODUCE[lE]===sE) return "动爻生世（生我），得人助、事有进益。";
+    if(PRODUCE[sE]===lE) return "世生动爻（我生），我方付出、耗神费力。";
+    if(KE[lE]===sE) return "动爻克世（克我），有阻有耗、宜慎防。";
+    if(KE[sE]===lE) return "世克动爻（我克），我制其事、可掌其权。";
+    return "关系寻常。";
+  }
+  function totalLine(r){
+    if(!r.hasMoving) return "静卦，事态少变，依本卦之体与世应、六亲旺衰观其大势。";
+    var n=r.lines.filter(function(l){return l.moving;}).length;
+    if(n===1) return "独发，事机专一，以该动爻之辞与六亲、生克为主断。";
+    if(n===2) return "二爻发动，事有两途或表里，宜合观二动爻之生克向背。";
+    return "多动（"+n+" 爻），事绪纷繁、变机交错，当以世应为枢、察动爻之向背而定。";
+  }
+  function synthCard(r, yaos){
+    var shi=r.lines[r.shi], ying=r.lines[r.ying];
+    var card=el("div","card jing syn");
+    card.appendChild(el("h3",null,"综合参断 · 体用 · 世应 · 动爻"));
+    var rows=el("div");
+    var su="本卦（"+r.ben.name+"）为体，主我、内因；"+(r.hasMoving?("变卦（"+r.bian.name+"）为用，主事、外缘。"):"静卦无变，体用未分，事态平稳。");
+    rows.appendChild(srow("体用", su));
+    rows.appendChild(srow("世应", "世爻（"+shi.gz+"·"+shi.qin+"）为我方；应爻（"+ying.gz+"·"+ying.qin+"）为对方/环境，分居第 "+(r.shi+1)+" / "+(r.ying+1)+" 爻。"));
+    var hu=LIuyao.hugua(yaos);
+    rows.appendChild(srow("互卦", "「"+hu.name+"」——本卦内藏之象，主事之中段情态、隐伏之机，与体用合参。"));
+    if(r.hasMoving){
+      r.lines.forEach(function(l){
+        if(l.moving){
+          var posName=["初","二","三","四","五","上"][l.pos];
+          var yaoTi=(l.type===7||l.type===9)?"九":"六";
+          rows.appendChild(srow("动爻 "+yaoTi+posName, "（"+l.qin+"·"+l.zhi+"·"+l.zhiElem+"）"+relTo(shi,l)));
+        }
+      });
+    } else {
+      rows.appendChild(srow("动爻", "无动爻（静卦），以世应、六亲旺衰观其大势。"));
+    }
+    card.appendChild(rows);
+    card.appendChild(el("div","note","总断：「"+totalLine(r)+"」"));
+    card.appendChild(el("div","note","用神之取随所占之事而异：财依妻财、官依官鬼、文书依父母、小口依子孙、同辈依兄弟。此以世爻为“我”、应爻为“彼”、动爻为变机，供合参；具体问事须另行定用神，方定吉凶。"));
+    return card;
+  }
+
+  function render(r, yaos){
     var box=$("#liuyao-result"); box.innerHTML="";
+    var Y=(typeof window!=="undefined"&&window.YIJING)?window.YIJING:(typeof YIJING!=="undefined"?YIJING:null);
+    // 卦象
     var cg=el("div","card"); cg.appendChild(el("h3",null,"卦象 · 本宫 "+r.palace+"（"+r.palaceElem+"）"));
     var wrap=el("div","gua-wrap");
     wrap.appendChild(renderGua("本卦", r.ben, r.lines));
     if(r.hasMoving){
-      // 变卦 lines：取本卦 lines 但 yin 在动爻处翻转，moving 置 false
       var bl=r.lines.map(function(l){ return {gz:l.gz,zhi:l.zhi,zhiElem:l.zhiElem,yin:l.moving?!l.yin:l.yin,type:l.type,moving:false,isBian:l.moving,qin:l.qin,god:l.god,isShi:l.isShi,isYing:l.isYing}; });
       wrap.appendChild(renderGua("变卦", r.bian, bl));
     }
@@ -162,47 +245,51 @@
     cg.appendChild(el("div","meta",
       "<span class='m'>世爻在第 "+(r.shi+1)+" 爻</span>"+
       "<span class='m'>应爻在第 "+(r.ying+1)+" 爻</span>"+
-      "<span class='m'>日干 "+r.dayGan+"</span>"+
-      (r.hasMoving?"":"")));
+      "<span class='m'>日干 "+r.dayGan+"</span>"));
     cg.appendChild(el("div","note","纳甲依本宫（"+r.palace+"）安六爻干支；六亲依宫五行与本爻地支五行生克（我、生我、我克、克我、同我）；六兽依日干起例。动爻以朱砂色标记，为事之变机。"));
     box.appendChild(cg);
 
-    // 卦辞爻辞
-    var Y = (typeof window!=="undefined" && window.YIJING) ? window.YIJING : (typeof YIJING!=="undefined"?YIJING:null);
+    // 互卦
+    var hu=LIuyao.hugua(yaos);
+    var ch=el("div","card");
+    ch.appendChild(el("h3",null,"互卦 · 体中之体"));
+    var hwrap=el("div","row");
+    hwrap.appendChild(miniGua("互卦", hu.idx));
+    var hinfo=el("div","col");
+    hinfo.appendChild(el("div","note","互卦取法：下互取本卦二、三、四爻，上互取三、四、五爻，是卦中内藏之象。"));
+    hinfo.appendChild(el("div","note","互卦为「"+hu.name+"」。观互卦可参本卦未尽之意，与变卦合看，体·用·互·变四象乃六爻取象之要。"));
+    hwrap.appendChild(hinfo);
+    ch.appendChild(hwrap);
+    box.appendChild(ch);
+
+    // 经文 + 综合
     if(Y){
       var jc=el("div","card jing");
-      jc.appendChild(el("h3",null,"周易经文 · 卦辞爻辞"));
-      var jrows=el("div");
-      // 本卦卦辞
-      var r0=el("div","jrow");
-      r0.appendChild(el("div","jtag t","本卦 · 卦辞"));
-      r0.appendChild(el("div","jtxt",(r.ben.name||"")+"　"+Y.GUACI[r.ben.idx]));
-      jrows.appendChild(r0);
-      // 动爻爻辞（本卦动爻）
+      jc.appendChild(el("h3",null,"周易经文 · 卦辞 · 彖传 · 大象传"));
+      jc.appendChild(jsec("本卦 · "+r.ben.name, Y.GUACI[r.ben.idx], Y.TUAN[r.ben.idx], Y.DAXIANG[r.ben.idx]));
       if(r.hasMoving){
         r.lines.forEach(function(l){
           if(l.moving){
             var posName=["初","二","三","四","五","上"][l.pos];
             var yaoTi=(l.type===7||l.type===9)?"九":"六";
-            var jr=el("div","jrow");
-            jr.appendChild(el("div","jtag jqin","本卦动爻 · "+yaoTi+posName));
-            jr.appendChild(el("div","jtxt",Y.YAOCI[r.ben.idx][l.pos]));
-            jrows.appendChild(jr);
+            var sec=el("div","jsec");
+            sec.appendChild(el("div","jtag jqin","动爻 · "+yaoTi+posName+"（"+l.qin+"）"));
+            var bd=el("div");
+            bd.appendChild(el("div","jtxt","本卦：「"+Y.YAOCI[r.ben.idx][l.pos]+"」"));
+            bd.appendChild(el("div","jtxt","之卦：「"+Y.YAOCI[r.bian.idx][l.pos]+"」"));
+            sec.appendChild(bd);
+            jc.appendChild(sec);
           }
         });
-        // 变卦卦辞
-        var r1=el("div","jrow");
-        r1.appendChild(el("div","jtag t","变卦 · 卦辞"));
-        r1.appendChild(el("div","jtxt",(r.bian.name||"")+"　"+Y.GUACI[r.bian.idx]));
-        jrows.appendChild(r1);
+        jc.appendChild(jsec("变卦 · "+r.bian.name, Y.GUACI[r.bian.idx], Y.TUAN[r.bian.idx], Y.DAXIANG[r.bian.idx]));
       }
-      jc.appendChild(jrows);
-      jc.appendChild(el("div","note","六爻以本卦动爻之爻辞为主断（静卦则观卦辞之体）。经文为《周易》通行本原文，断语须合纳甲、世应、六亲、五行生克综合参看，仅作传统象数参考。"));
+      jc.appendChild(el("div","note","一爻动，以本卦动爻爻辞为主、之卦（变卦）对应爻参看；多爻动则合观本、变二卦之辞。经文为《周易》通行本原文，断语须合纳甲、世应、六亲、五行生克综合参看，仅作传统象数参考。"));
       box.appendChild(jc);
+      box.appendChild(synthCard(r, yaos));
     }
 
     if(!r.hasMoving){
-      box.appendChild(el("div","note","本次摇卦无动爻（静卦），仅断本卦之体，事态相对平稳、变化少。"));
+      box.appendChild(el("div","note","本次摇卦无动爻（静卦），仅断本卦之体，事态相对平稳、变化少；仍可参互卦与卦辞大象以观其势。"));
     }
     box.scrollIntoView({behavior:"smooth",block:"start"});
   }
@@ -218,7 +305,7 @@
         var yaos=LIuyao.shake();
         var dg=+$("#lg-daygan").value;
         var r=LIuyao.analyze(yaos, dg);
-        render(r);
+        render(r, yaos);
       }catch(e){ err.style.display="block"; err.textContent="⚠ "+e.message; }
       coins.classList.remove("on");
       [].forEach.call(coins.children,function(c){ c.classList.remove("spin"); });
