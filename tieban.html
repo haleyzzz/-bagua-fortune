@@ -1,0 +1,202 @@
+<!doctype html>
+<html lang="zh">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>铁板神数 · 演绎版</title>
+<style>
+  :root{
+    --bg:#f5ecd6; --paper:#fbf4dc; --ink:#2a2418;
+    --vermilion:#a83018; --bronze:#8a6824; --line:#cdbf9a;
+  }
+  *{box-sizing:border-box}
+  body{
+    margin:0; background:var(--bg); color:var(--ink);
+    font-family:"STKaiti","KaiTi","楷体","Songti SC",serif;
+    line-height:1.7; padding:18px;
+  }
+  .wrap{max-width:880px; margin:0 auto; background:var(--paper);
+    border:1px solid var(--line); border-radius:10px; padding:22px 24px 30px;
+    box-shadow:0 4px 18px rgba(80,60,20,.12);
+  }
+  header{text-align:center; border-bottom:2px double var(--bronze); padding-bottom:14px; margin-bottom:18px}
+  header h1{margin:0; font-size:30px; letter-spacing:6px; color:var(--vermilion)}
+  header .sub{font-size:13px; letter-spacing:2px; color:var(--bronze); margin-top:4px}
+  .decl{font-size:12.5px; color:var(--vermilion); background:#f3e6c8;
+    border:1px dashed var(--vermilion); border-radius:8px; padding:8px 12px; margin:14px 0; line-height:1.6}
+  .form{display:flex; flex-wrap:wrap; gap:10px 14px; align-items:flex-end; justify-content:center; margin-bottom:20px}
+  .field{display:flex; flex-direction:column; gap:4px}
+  .field label{font-size:12px; color:var(--bronze); letter-spacing:1px}
+  .field input,.field select{
+    font-family:inherit; font-size:15px; color:var(--ink);
+    background:#fffdf6; border:1px solid var(--bronze); border-radius:6px; padding:6px 8px; min-width:78px;
+  }
+  #go{font-family:inherit; font-size:15px; letter-spacing:2px; color:#fff;
+    background:var(--vermilion); border:none; border-radius:6px; padding:8px 18px; cursor:pointer}
+  #go:hover{opacity:.9}
+  .card{background:#fffdf6; border:1px solid var(--line); border-radius:8px; padding:14px 16px; margin-bottom:16px}
+  .card h3{margin:0 0 12px; font-size:17px; letter-spacing:2px; color:var(--bronze); border-left:4px solid var(--vermilion); padding-left:8px}
+  /* 四柱盘 */
+  .sizhu{display:grid; grid-template-columns:repeat(4,1fr); gap:10px}
+  .zhcol{text-align:center; background:#f7efd8; border:1px solid var(--line); border-radius:8px; padding:12px 6px}
+  .zhcol .lab{font-size:13px; color:var(--bronze); letter-spacing:2px}
+  .zhcol .gz{font-size:30px; color:var(--vermilion); margin:6px 0 2px; letter-spacing:2px}
+  .zhcol .ny{font-size:12px; color:var(--ink); opacity:.75}
+  .meta{display:flex; flex-wrap:wrap; gap:8px 18px; font-size:13px; color:var(--ink); margin-top:10px; justify-content:center}
+  .meta b{color:var(--bronze); font-weight:normal}
+  .base{text-align:center; margin-top:12px; font-size:14px; color:var(--vermilion)}
+  .base b{font-size:20px; letter-spacing:2px}
+  /* 条文 */
+  .entry{display:flex; gap:12px; padding:12px 4px; border-bottom:1px dotted var(--line)}
+  .entry:last-child{border-bottom:none}
+  .eno{font-size:30px; color:var(--vermilion); min-width:46px; text-align:center; line-height:1.1;
+    border:2px solid var(--vermilion); border-radius:8px; height:46px; display:flex; align-items:center; justify-content:center; flex:0 0 auto}
+  .ebody{flex:1}
+  .ebody .eh{font-size:15px; color:var(--bronze); letter-spacing:1px; margin-bottom:2px}
+  .ebody .eh .gz{color:var(--vermilion); margin-left:8px; font-size:16px}
+  .ebody .et{font-size:15px; line-height:1.8}
+  /* 三限 */
+  .yuan{display:grid; grid-template-columns:repeat(3,1fr); gap:12px}
+  .ycol{background:#f7efd8; border:1px solid var(--line); border-radius:8px; padding:12px 12px}
+  .ycol .yn{font-size:15px; color:var(--vermilion); letter-spacing:2px; text-align:center; margin-bottom:6px}
+  .ycol .yf{font-size:12px; color:var(--bronze); text-align:center; margin-bottom:8px}
+  .ycol .yt{font-size:13.5px; line-height:1.7}
+  footer{margin-top:18px; font-size:12px; color:var(--bronze); text-align:center; line-height:1.7; border-top:1px solid var(--line); padding-top:12px}
+  @media(max-width:720px){
+    .sizhu{grid-template-columns:repeat(2,1fr)}
+    .yuan{grid-template-columns:1fr}
+    .zhcol .gz{font-size:26px}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>铁板神数</h1>
+    <div class="sub">Tie Ban Shen Shu · 演绎版</div>
+  </header>
+
+  <div class="decl">
+    ⚠️ 本盘为传统规律<b>演绎性推演</b>，非算法引擎计算。其以四柱干支之阴阳、五行、纳音，按传统铁板框架推导一组编号条文，仅作文化参考与象征解读，<b>不作定数断言</b>。
+  </div>
+
+  <section class="form">
+    <div class="field"><label>公历年</label><input id="y" type="number" value="1987" min="1901" max="2099" /></div>
+    <div class="field"><label>月</label><input id="m" type="number" value="10" min="1" max="12" /></div>
+    <div class="field"><label>日</label><input id="d" type="number" value="16" min="1" max="31" /></div>
+    <div class="field"><label>时辰</label>
+      <select id="hour">
+        <option value="0">子时 (23–1)</option>
+        <option value="2">丑时 (1–3)</option>
+        <option value="4">寅时 (3–5)</option>
+        <option value="6">卯时 (5–7)</option>
+        <option value="8">辰时 (7–9)</option>
+        <option value="10">巳时 (9–11)</option>
+        <option value="12" selected>午时 (11–13)</option>
+        <option value="14">未时 (13–15)</option>
+        <option value="16">申时 (15–17)</option>
+        <option value="18">酉时 (17–19)</option>
+        <option value="20">戌时 (19–21)</option>
+        <option value="22">亥时 (21–23)</option>
+      </select>
+    </div>
+    <div class="field"><label>性别</label>
+      <select id="gender"><option value="男" selected>男</option><option value="女">女</option></select>
+    </div>
+    <button id="go">推算条文</button>
+  </section>
+
+  <main id="tieban-result"></main>
+
+  <footer>
+    本盘为传统规律演绎性推演，非算法引擎计算；条文依四柱干支规则生成，非古籍原文，仅供文化参考。<br/>
+    命理是参考，不是定数。重大事项请咨询相应专业人士。
+  </footer>
+</div>
+
+<script src="js-engine/src/lunar.js"></script>
+<script src="js-engine/src/tieban.js"></script>
+<script>
+(function(){
+  function $(s){ return document.querySelector(s); }
+  function el(t, cls, html){ var e=document.createElement(t); if(cls) e.className=cls; if(html!=null) e.innerHTML=html; return e; }
+
+  function render(q){
+    var box=$('#tieban-result'); box.innerHTML='';
+
+    // 四柱盘
+    var gz=q.ganzhi;
+    var c1=el('div','card');
+    c1.appendChild(el('h3',null,'四柱盘面'));
+    var sz=el('div','sizhu');
+    var cols=[
+      {lab:'年柱', gz:gz.year8, ny:q.nayin.year},
+      {lab:'月柱', gz:gz.month8, ny:''},
+      {lab:'日柱', gz:gz.day8,  ny:q.nayin.day},
+      {lab:'时柱', gz:gz.hour8, ny:''}
+    ];
+    cols.forEach(function(c){
+      var col=el('div','zhcol');
+      col.appendChild(el('div','lab',c.lab));
+      col.appendChild(el('div','gz',c.gz));
+      col.appendChild(el('div','ny',c.ny||'&nbsp;'));
+      sz.appendChild(col);
+    });
+    c1.appendChild(sz);
+    var mt=el('div','meta');
+    mt.innerHTML='<span><b>公历</b>'+q.meta.y+'-'+q.meta.m+'-'+q.meta.d+'</span>'
+      +'<span><b>农历</b>'+q.meta.lunar.yearCN+'年'+q.meta.lunar.monthCN+q.meta.lunar.dayCN+'</span>'
+      +'<span><b>生肖</b>'+q.meta.zodiac+'</span>'
+      +'<span><b>性别</b>'+q.meta.gender+'</span>';
+    c1.appendChild(mt);
+    c1.appendChild(el('div','base','考刻基数　<b>'+q.baseNo+'</b>'));
+    box.appendChild(c1);
+
+    // 八条编号条文
+    var c2=el('div','card');
+    c2.appendChild(el('h3',null,'编号条文 · 壹至捌'));
+    q.entries.forEach(function(e){
+      var row=el('div','entry');
+      row.appendChild(el('div','eno',e.no));
+      var body=el('div','ebody');
+      body.appendChild(el('div','eh',e.gong+'<span class="gz">'+e.gz+'</span>'));
+      body.appendChild(el('div','et',e.text));
+      row.appendChild(body);
+      c2.appendChild(row);
+    });
+    box.appendChild(c2);
+
+    // 三限横列
+    var c3=el('div','card');
+    c3.appendChild(el('h3',null,'三限 · 上中下元'));
+    var yc=el('div','yuan');
+    q.yuan.forEach(function(y){
+      var col=el('div','ycol');
+      col.appendChild(el('div','yn',y.name));
+      col.appendChild(el('div','yf',y.from));
+      col.appendChild(el('div','yt',y.text));
+      yc.appendChild(col);
+    });
+    c3.appendChild(yc);
+    box.appendChild(c3);
+
+    box.scrollIntoView({behavior:'smooth',block:'start'});
+  }
+
+  function run(){
+    var y=+$('#y').value, m=+$('#m').value, d=+$('#d').value, hour=+$('#hour').value, gender=$('#gender').value;
+    if(!y||!m||!d) return;
+    try{
+      render(TIEBAN.query(y,m,d,hour,gender));
+    }catch(err){
+      alert('推算失败：'+err.message+'\n（本引擎支持公历 1901–2099，1 月初可能对应上一年农历）');
+    }
+  }
+
+  $('#go').addEventListener('click', run);
+  // 默认渲染一次
+  render(TIEBAN.query(1987,10,16,12,'男'));
+})();
+</script>
+</body>
+</html>
