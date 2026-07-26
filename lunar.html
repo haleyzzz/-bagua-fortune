@@ -153,6 +153,7 @@
   "use strict";
   function $(s){return document.querySelector(s);}
   function el(t,c,h){var e=document.createElement(t);if(c)e.className=c;if(h!=null)e.innerHTML=h;return e;}
+  function esc(s){return String(s==null?'':s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];});}
   var SHICHEN = {23:"子时",1:"丑时",3:"寅时",5:"卯时",7:"辰时",9:"巳时",11:"午时",13:"未时",15:"申时",17:"酉时",19:"戌时",21:"亥时"};
 
   function todayStr(){
@@ -178,12 +179,12 @@
     var box=$("#lunar-result"); box.innerHTML="";
     // 主盘面
     var c=el("div","card");
-    c.appendChild(el("h3",null,"黄历 · "+q.solar.year+"年"+q.solar.month+"月"+q.solar.day+"日 <span class='badge'>"+q.lunar.yearCN+"年</span>"));
+    c.appendChild(el("h3",null,"黄历 · "+esc(q.solar.year)+"年"+esc(q.solar.month)+"月"+esc(q.solar.day)+"日 <span class='badge'>"+esc(q.lunar.yearCN)+"年</span>"));
     var al=el("div","almanac");
     var bd=el("div","big-date");
-    bd.appendChild(el("div","solar",q.solar.year+"年"+q.solar.month+"月"+q.solar.day+"日"));
-    bd.appendChild(el("div","week",q.solar.week));
-    bd.appendChild(el("div","lunar",q.lunar.monthCN+(q.lunar.monthLong?"大":"小")+" · "+q.lunar.dayCN));
+    bd.appendChild(el("div","solar",esc(q.solar.year)+"年"+esc(q.solar.month)+"月"+esc(q.solar.day)+"日"));
+    bd.appendChild(el("div","week",esc(q.solar.week)));
+    bd.appendChild(el("div","lunar",esc(q.lunar.monthCN)+(q.lunar.monthLong?"大":"小")+" · "+esc(q.lunar.dayCN)));
     if(q.festival) bd.appendChild(el("div","fest",q.festival));
     al.appendChild(bd);
     var mc=el("div","meta-col");

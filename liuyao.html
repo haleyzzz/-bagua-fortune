@@ -139,6 +139,7 @@
   "use strict";
   function $(s){return document.querySelector(s);}
   function el(t,c,h){var e=document.createElement(t);if(c)e.className=c;if(h!=null)e.innerHTML=h;return e;}
+  function esc(s){return String(s==null?'':s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];});}
 
   // 每爻一行：阳=整条；阴=两断条（用 yin 类断开）
   function yaoRow(line, moving){

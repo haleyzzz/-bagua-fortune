@@ -140,6 +140,7 @@
   "use strict";
   function $(s){return document.querySelector(s);}
   function el(t,c,h){var e=document.createElement(t);if(c)e.className=c;if(h!=null)e.innerHTML=h;return e;}
+  function esc(s){return String(s==null?'':s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];});}
 
   $("#btn-draw").addEventListener("click",function(){
     var err=$("#err-tarot"); err.style.display="none"; err.textContent="";

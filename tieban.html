@@ -81,9 +81,9 @@
   </div>
 
   <section class="form">
-    <div class="field"><label>公历年</label><input id="y" type="number" value="1987" min="1901" max="2099" /></div>
-    <div class="field"><label>月</label><input id="m" type="number" value="10" min="1" max="12" /></div>
-    <div class="field"><label>日</label><input id="d" type="number" value="16" min="1" max="31" /></div>
+    <div class="field"><label>公历年</label><input id="y" type="number" inputmode="numeric" value="1987" min="1901" max="2099" /></div>
+    <div class="field"><label>月</label><input id="m" type="number" inputmode="numeric" value="10" min="1" max="12" /></div>
+    <div class="field"><label>日</label><input id="d" type="number" inputmode="numeric" value="16" min="1" max="31" /></div>
     <div class="field"><label>时辰</label>
       <select id="hour">
         <option value="0">子时 (23–1)</option>
@@ -106,6 +106,7 @@
     <button id="go">推算条文</button>
   </section>
 
+  <div id="err-tieban" style="display:none;color:#a83018;background:#fbf4dc;border:1px solid #8a6824;padding:10px 14px;border-radius:8px;margin:12px 0;font-size:14px"></div>
   <main id="tieban-result"></main>
 
   <footer>
@@ -120,6 +121,7 @@
 (function(){
   function $(s){ return document.querySelector(s); }
   function el(t, cls, html){ var e=document.createElement(t); if(cls) e.className=cls; if(html!=null) e.innerHTML=html; return e; }
+  function esc(s){ return String(s==null?'':s).replace(/[&<>"']/g,function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]; }); }
 
   function render(q){
     var box=$('#tieban-result'); box.innerHTML='';
@@ -144,10 +146,10 @@
     });
     c1.appendChild(sz);
     var mt=el('div','meta');
-    mt.innerHTML='<span><b>公历</b>'+q.meta.y+'-'+q.meta.m+'-'+q.meta.d+'</span>'
-      +'<span><b>农历</b>'+q.meta.lunar.yearCN+'年'+q.meta.lunar.monthCN+q.meta.lunar.dayCN+'</span>'
-      +'<span><b>生肖</b>'+q.meta.zodiac+'</span>'
-      +'<span><b>性别</b>'+q.meta.gender+'</span>';
+    mt.innerHTML='<span><b>公历</b>'+esc(q.meta.y)+'-'+esc(q.meta.m)+'-'+esc(q.meta.d)+'</span>'
+      +'<span><b>农历</b>'+esc(q.meta.lunar.yearCN)+'年'+esc(q.meta.lunar.monthCN)+esc(q.meta.lunar.dayCN)+'</span>'
+      +'<span><b>生肖</b>'+esc(q.meta.zodiac)+'</span>'
+      +'<span><b>性别</b>'+esc(q.meta.gender)+'</span>';
     c1.appendChild(mt);
     c1.appendChild(el('div','base','考刻基数　<b>'+q.baseNo+'</b>'));
     box.appendChild(c1);
@@ -159,8 +161,8 @@
       var row=el('div','entry');
       row.appendChild(el('div','eno',e.no));
       var body=el('div','ebody');
-      body.appendChild(el('div','eh',e.gong+'<span class="gz">'+e.gz+'</span>'));
-      body.appendChild(el('div','et',e.text));
+      body.appendChild(el('div','eh',esc(e.gong)+'<span class="gz">'+esc(e.gz)+'</span>'));
+      body.appendChild(el('div','et',esc(e.text)));
       row.appendChild(body);
       c2.appendChild(row);
     });
@@ -186,10 +188,11 @@
   function run(){
     var y=+$('#y').value, m=+$('#m').value, d=+$('#d').value, hour=+$('#hour').value, gender=$('#gender').value;
     if(!y||!m||!d) return;
+    var er=document.getElementById('err-tieban'); if(er) er.style.display='none';
     try{
       render(TIEBAN.query(y,m,d,hour,gender));
     }catch(err){
-      alert('推算失败：'+err.message+'\n（本引擎支持公历 1901–2099，1 月初可能对应上一年农历）');
+      var er=document.getElementById('err-tieban'); if(er){er.textContent='⚠ 推算失败：'+err.message+'（本引擎支持公历 1901–2099，1 月初可能对应上一年农历）'; er.style.display='block';}
     }
   }
 

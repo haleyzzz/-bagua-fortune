@@ -79,23 +79,23 @@
       <h3>双方出生信息</h3>
       <div class="sub2">男方</div>
       <div class="row">
-        <div class="col"><label>年</label><input id="m-y" type="number" value="1990"></div>
-        <div class="col"><label>月</label><input id="m-m" type="number" value="5" min="1" max="12"></div>
-        <div class="col"><label>日</label><input id="m-d" type="number" value="20" min="1" max="31"></div>
+        <div class="col"><label>年</label><input id="m-y" type="number" inputmode="numeric" value="1990"></div>
+        <div class="col"><label>月</label><input id="m-m" type="number" inputmode="numeric" value="5" min="1" max="12"></div>
+        <div class="col"><label>日</label><input id="m-d" type="number" inputmode="numeric" value="20" min="1" max="31"></div>
       </div>
       <div class="row">
-        <div class="col"><label>时(0-23)</label><input id="m-h" type="number" value="10"></div>
-        <div class="col"><label>分</label><input id="m-min" type="number" value="0"></div>
+        <div class="col"><label>时(0-23)</label><input id="m-h" type="number" inputmode="numeric" value="10"></div>
+        <div class="col"><label>分</label><input id="m-min" type="number" inputmode="numeric" value="0"></div>
       </div>
       <div class="sub2">女方</div>
       <div class="row">
-        <div class="col"><label>年</label><input id="f-y" type="number" value="1992"></div>
-        <div class="col"><label>月</label><input id="f-m" type="number" value="8" min="1" max="12"></div>
-        <div class="col"><label>日</label><input id="f-d" type="number" value="14" min="1" max="31"></div>
+        <div class="col"><label>年</label><input id="f-y" type="number" inputmode="numeric" value="1992"></div>
+        <div class="col"><label>月</label><input id="f-m" type="number" inputmode="numeric" value="8" min="1" max="12"></div>
+        <div class="col"><label>日</label><input id="f-d" type="number" inputmode="numeric" value="14" min="1" max="31"></div>
       </div>
       <div class="row">
-        <div class="col"><label>时(0-23)</label><input id="f-h" type="number" value="14"></div>
-        <div class="col"><label>分</label><input id="f-min" type="number" value="0"></div>
+        <div class="col"><label>时(0-23)</label><input id="f-h" type="number" inputmode="numeric" value="14"></div>
+        <div class="col"><label>分</label><input id="f-min" type="number" inputmode="numeric" value="0"></div>
       </div>
       <button class="btn" id="btn-he">合 婚 评 分</button>
       <div class="err" id="err-he"></div>
@@ -127,6 +127,7 @@
   "use strict";
   function $(s){return document.querySelector(s);}
   function el(t,c,h){var e=document.createElement(t);if(c)e.className=c;if(h!=null)e.innerHTML=h;return e;}
+  function esc(s){return String(s==null?'':s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];});}
   var WX={"甲":"木","乙":"木","丙":"火","丁":"火","戊":"土","己":"土","庚":"金","辛":"金","壬":"水","癸":"水",
     "子":"水","亥":"水","寅":"木","卯":"木","巳":"火","午":"火","申":"金","酉":"金","辰":"土","戌":"土","丑":"土","未":"土"};
   // tabs

@@ -77,16 +77,17 @@
   </div>
 
   <form id="f-astro">
-    <div class="col"><label>出生年</label><input id="ay" type="number" value="1987" min="1900" max="2100"></div>
-    <div class="col"><label>月</label><input id="am" type="number" value="10" min="1" max="12"></div>
-    <div class="col"><label>日</label><input id="ad" type="number" value="16" min="1" max="31"></div>
-    <div class="col"><label>时(24h)</label><input id="ah" type="number" value="12" min="0" max="23"></div>
-    <div class="col"><label>分</label><input id="amn" type="number" value="0" min="0" max="59"></div>
+    <div class="col"><label>出生年</label><input id="ay" type="number" inputmode="numeric" value="1987" min="1900" max="2100"></div>
+    <div class="col"><label>月</label><input id="am" type="number" inputmode="numeric" value="10" min="1" max="12"></div>
+    <div class="col"><label>日</label><input id="ad" type="number" inputmode="numeric" value="16" min="1" max="31"></div>
+    <div class="col"><label>时(24h)</label><input id="ah" type="number" inputmode="numeric" value="12" min="0" max="23"></div>
+    <div class="col"><label>分</label><input id="amn" type="number" inputmode="numeric" value="0" min="0" max="59"></div>
     <div class="col"><label>出生城市</label><select id="acity"></select></div>
     <label class="chk"><input id="adst" type="checkbox"> 夏令时(+1h)</label>
     <button class="btn" id="btn-astro" type="button">排盘</button>
   </form>
 
+  <div id="err-astro" style="display:none;color:#ffd9d2;background:rgba(200,72,56,.14);border:1px solid #d85848;padding:10px 14px;border-radius:8px;margin:12px 0;font-size:14px"></div>
   <div id="astro-result"></div>
 
   <footer>
@@ -108,6 +109,7 @@
   sel.value = '北京';
 
   function el(t,c,txt){ var e=document.createElement(t); if(c) e.className=c; if(txt!=null) e.textContent=txt; return e; }
+  function esc(s){ return String(s==null?'':s).replace(/[&<>"']/g,function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]; }); }
 
   // 屏幕坐标映射：MC 在顶，ASC 在左
   function pt(cx,cy,r,lon,mcLon){
@@ -159,10 +161,11 @@
 
   function render(r){
     var box = $('#astro-result'); box.innerHTML='';
+    var er = $('#err-astro'); if(er) er.style.display='none';
     var grid = el('div','grid');
 
     // 盘
-    var c1 = el('div','card'); c1.appendChild(el('h3',null,'本命盘 · '+(r.meta.city)));
+    var c1 = el('div','card'); c1.appendChild(el('h3',null,'本命盘 · '+esc(r.meta.city)));
     var cb = el('div','chartbox'); cb.innerHTML = drawChart(r); c1.appendChild(cb);
     c1.appendChild(el('div','note','ASC '+r.asc.name+r.asc.deg.toFixed(1)+'° · MC '+r.mc.name+r.mc.deg.toFixed(1)+'° · 系统 '+r.system+' · UTC '+r.meta.utcISO));
 
@@ -171,13 +174,13 @@
     var t = el('table'); t.innerHTML='<tr><th>行星</th><th>星座</th><th>度数</th><th>宫</th></tr>';
     r.planets.forEach(function(p){
       var tr=el('tr');
-      tr.innerHTML='<td><span class="sym">'+(PSYM[p.key]||'')+'</span>'+p.cn+(p.retro?'<span class="retro">逆</span>':'')+'</td>'+
-        '<td>'+p.signName+'</td><td>'+p.signDeg.toFixed(2)+'°</td><td>'+p.house+'</td>';
+      tr.innerHTML='<td><span class="sym">'+(PSYM[p.key]||'')+'</span>'+esc(p.cn)+(p.retro?'<span class="retro">逆</span>':'')+'</td>'+
+        '<td>'+esc(p.signName)+'</td><td>'+p.signDeg.toFixed(2)+'°</td><td>'+esc(p.house)+'</td>';
       t.appendChild(tr);
     });
     r.nodes.forEach(function(n){
       var tr=el('tr');
-      tr.innerHTML='<td><span class="sym">'+(ASYM[n.key]||'')+'</span>'+n.cn+'</td><td>'+n.signName+'</td><td>'+n.signDeg.toFixed(2)+'°</td><td>'+n.house+'</td>';
+      tr.innerHTML='<td><span class="sym">'+(ASYM[n.key]||'')+'</span>'+esc(n.cn)+'</td><td>'+esc(n.signName)+'</td><td>'+n.signDeg.toFixed(2)+'°</td><td>'+esc(n.house)+'</td>';
       t.appendChild(tr);
     });
     c2.appendChild(t);
@@ -231,7 +234,7 @@
         hh:+$('#ah').value, mm:+$('#amn').value, city:$('#acity').value, dst:$('#adst').checked
       });
       render(r);
-    }catch(e){ alert('排盘出错：'+e.message); console.error(e); }
+    }catch(e){ var er=$('#err-astro'); if(er){er.textContent='⚠ 排盘出错：'+e.message; er.style.display='block';} console.error(e); }
   });
 
   // 默认排一次

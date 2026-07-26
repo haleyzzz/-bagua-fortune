@@ -86,8 +86,8 @@
       <h3>时间起卦 <span class="badge">取当前时刻</span></h3>
       <div class="row">
         <div class="col"><label>年支</label><select id="t-yzhi"></select></div>
-        <div class="col"><label>月</label><input id="t-m" type="number" value="" placeholder="农历月"></div>
-        <div class="col"><label>日</label><input id="t-d" type="number" value="" placeholder="农历日"></div>
+        <div class="col"><label>月</label><input id="t-m" type="number" inputmode="numeric" value="" placeholder="农历月"></div>
+        <div class="col"><label>日</label><input id="t-d" type="number" inputmode="numeric" value="" placeholder="农历日"></div>
         <div class="col"><label>时支</label><select id="t-hzhi"></select></div>
       </div>
       <div class="note">留空则自动取此刻公历对应的农历日期与干支。也可手填农历年月日时支。</div>
@@ -101,9 +101,9 @@
     <div class="card">
       <h3>数字起卦 <span class="badge">至少两个数字</span></h3>
       <div class="row">
-        <div class="col"><label>数字 ①</label><input id="n1" type="number" value="3"></div>
-        <div class="col"><label>数字 ②</label><input id="n2" type="number" value="8"></div>
-        <div class="col"><label>数字 ③（可选）</label><input id="n3" type="number" value="5"></div>
+        <div class="col"><label>数字 ①</label><input id="n1" type="number" inputmode="numeric" value="3"></div>
+        <div class="col"><label>数字 ②</label><input id="n2" type="number" inputmode="numeric" value="8"></div>
+        <div class="col"><label>数字 ③（可选）</label><input id="n3" type="number" inputmode="numeric" value="5"></div>
       </div>
       <div class="note">上卦 = 数① % 8，下卦 = 数② % 8，动爻 =（数①+数②+数③） % 6。</div>
       <button class="btn" id="btn-num">起 卦</button>
@@ -125,7 +125,7 @@
             <option value="中">中</option>
           </select>
         </div>
-        <div class="col"><label>附加数（可选）</label><input id="d-extra" type="number" value="0"></div>
+        <div class="col"><label>附加数（可选）</label><input id="d-extra" type="number" inputmode="numeric" value="0"></div>
       </div>
       <div class="note">上卦 = 方位数(东3南1西7北6东南5西南2西北8东北4中5)，下卦取年月日，动爻取方位数+年支月日。</div>
       <button class="btn" id="btn-dir">起 卦</button>
@@ -146,6 +146,7 @@
   "use strict";
   function $(s){return document.querySelector(s);}
   function el(t,c,h){var e=document.createElement(t);if(c)e.className=c;if(h!=null)e.innerHTML=h;return e;}
+  function esc(s){return String(s==null?'':s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];});}
   // tabs
   document.querySelectorAll(".tab").forEach(function(t){
     t.addEventListener("click",function(){

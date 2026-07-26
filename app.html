@@ -129,18 +129,18 @@
         </div>
       </div>
       <div class="row">
-        <div class="col"><label>年</label><input id="by" type="number" value="1990"></div>
-        <div class="col"><label>月</label><input id="bm" type="number" value="5" min="1" max="12"></div>
-        <div class="col"><label>日</label><input id="bd" type="number" value="20" min="1" max="31"></div>
+        <div class="col"><label>年</label><input id="by" type="number" inputmode="numeric" value="1990"></div>
+        <div class="col"><label>月</label><input id="bm" type="number" inputmode="numeric" value="5" min="1" max="12"></div>
+        <div class="col"><label>日</label><input id="bd" type="number" inputmode="numeric" value="20" min="1" max="31"></div>
       </div>
       <div class="row">
-        <div class="col"><label>时(0-23)</label><input id="bh" type="number" value="10" min="0" max="23"></div>
-        <div class="col"><label>分</label><input id="bmin" type="number" value="0" min="0" max="59"></div>
-        <div class="col"><label>经度(°)</label><input id="blon" type="number" value="120" step="0.1"></div>
+        <div class="col"><label>时(0-23)</label><input id="bh" type="number" inputmode="numeric" value="10" min="0" max="23"></div>
+        <div class="col"><label>分</label><input id="bmin" type="number" inputmode="numeric" value="0" min="0" max="59"></div>
+        <div class="col"><label>经度(°)</label><input id="blon" type="number" inputmode="numeric" value="120" step="0.1"></div>
       </div>
       <div class="row">
-        <div class="col"><label>流年(可选)</label><input id="fy" type="number" value="2026"></div>
-        <div class="col"><label>当前年龄(可选)</label><input id="age" type="number" value="36" min="0"></div>
+        <div class="col"><label>流年(可选)</label><input id="fy" type="number" inputmode="numeric" value="2026"></div>
+        <div class="col"><label>当前年龄(可选)</label><input id="age" type="number" inputmode="numeric" value="36" min="0"></div>
       </div>
       <button class="btn" id="btn-bazi">排 盘</button>
       <div class="err" id="err-bazi"></div>
@@ -179,6 +179,7 @@
     "子":"水","亥":"水","寅":"木","卯":"木","巳":"火","午":"火","申":"金","酉":"金","辰":"土","戌":"土","丑":"土","未":"土"};
   function $(s){return document.querySelector(s);}
   function el(t,c,h){var e=document.createElement(t);if(c)e.className=c;if(h!=null)e.innerHTML=h;return e;}
+  function esc(s){return String(s==null?'':s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];});}
 
   // Tab 切换 + 锚点
   function setTab(name){
@@ -230,7 +231,7 @@
     c1.appendChild(el("div","note","历法输入："+pp.input.kind+" "+pp.input.solar+" "+pp.input.time+
       "　|　真太阳时："+pp.true_solar_time.date+" "+pad(pp.true_solar_time.hour)+":"+pad(pp.true_solar_time.minute)+
       (pp.true_solar_time.late_zishi?" (晚子时跨日)":"")+
-      "　|　农历："+pp.lunar_display+"　生肖："+pp.animal));
+      "　|　农历："+esc(pp.lunar_display)+"　生肖："+esc(pp.animal)));
     box.appendChild(c1);
 
     // 五行统计
@@ -317,9 +318,9 @@
     $("#alm-title").textContent="当日黄历 · "+a.solar;
     var b=$("#alm-body"); b.innerHTML="";
     function line(k,v,cls){var l=el("div","line");l.appendChild(el("div","k",k));l.appendChild(el("div","v "+(cls||""),v));b.appendChild(l);}
-    line("农历",a.lunar_display);
-    line("干支",a.ganzhi.year+"年 "+a.ganzhi.month+"月 "+a.ganzhi.day+"日");
-    line("生肖",a.animal);
+    line("农历",esc(a.lunar_display));
+    line("干支",esc(a.ganzhi.year+"年 "+a.ganzhi.month+"月 "+a.ganzhi.day+"日"));
+    line("生肖",esc(a.animal));
     line("建除",a.jianchu.name);
     line("宜",a.yiji["宜"].join("、"),"yi");
     line("忌",a.yiji["忌"].join("、"),"ji");

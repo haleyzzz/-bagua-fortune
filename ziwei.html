@@ -100,9 +100,9 @@
   <div class="card">
     <h3>出生信息</h3>
     <div class="row">
-      <div class="col"><label>出生年</label><input id="zy" type="number" value="1990"></div>
-      <div class="col"><label>月</label><input id="zm" type="number" value="5" min="1" max="12"></div>
-      <div class="col"><label>日</label><input id="zd" type="number" value="20" min="1" max="31"></div>
+      <div class="col"><label>出生年</label><input id="zy" type="number" inputmode="numeric" value="1990"></div>
+      <div class="col"><label>月</label><input id="zm" type="number" inputmode="numeric" value="5" min="1" max="12"></div>
+      <div class="col"><label>日</label><input id="zd" type="number" inputmode="numeric" value="20" min="1" max="31"></div>
     </div>
     <div class="row">
       <div class="col">
@@ -130,8 +130,8 @@
           <option value="female">女</option>
         </select>
       </div>
-      <div class="col"><label>当前年龄(可选)</label><input id="zage" type="number" value="36" min="0"></div>
-      <div class="col"><label>流年年份(可选)</label><input id="zln" type="number" value="2026" min="1900" max="2100"></div>
+      <div class="col"><label>当前年龄(可选)</label><input id="zage" type="number" inputmode="numeric" value="36" min="0"></div>
+      <div class="col"><label>流年年份(可选)</label><input id="zln" type="number" inputmode="numeric" value="2026" min="1900" max="2100"></div>
       <div class="col"><label>农历月份(流月)</label><select id="zlm">
         <option value="1">正月(寅)</option><option value="2">二月(卯)</option>
         <option value="3">三月(辰)</option><option value="4">四月(巳)</option>
@@ -158,6 +158,7 @@
   "use strict";
   function $(s){return document.querySelector(s);}
   function el(t,c,h){var e=document.createElement(t);if(c)e.className=c;if(h!=null)e.innerHTML=h;return e;}
+  function esc(s){return String(s==null?'':s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];});}
   var BR_ORDER=["子","丑","寅","卯","辰","巳","午","未","申","酉","戌","亥"];
   // 天干地支（算流年干支用）
   var GAN=["甲","乙","丙","丁","戊","己","庚","辛","壬","癸"];
@@ -383,7 +384,7 @@
       });
     }
     var cm=el("div","card ln-card");
-    cm.appendChild(el("h3",null,"流月 · 农历"+lmMonth+"月（"+lmGan+lmZhi+"月）"+(lmMing?("　流月命宫："+lmMing.name+" "+lmMing.heavenlyStem+lmMing.earthlyBranch):"")));
+    cm.appendChild(el("h3",null,"流月 · 农历"+esc(lmMonth)+"月（"+esc(lmGan)+esc(lmZhi)+"月）"+(lmMing?("　流月命宫："+esc(lmMing.name)+" "+esc(lmMing.heavenlyStem)+esc(lmMing.earthlyBranch)):"")));
     if(lmMing){
       var gpm=el("div","gp");
       var lmSet=new Set(lmSF); lmSet.add(lmMing.name);

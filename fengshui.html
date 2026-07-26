@@ -94,7 +94,7 @@
     <div class="card">
       <h3>玄空飞星盘</h3>
       <div class="row">
-        <div class="col"><label>年份</label><input id="fx-year" type="number" value="2026"></div>
+        <div class="col"><label>年份</label><input id="fx-year" type="number" inputmode="numeric" value="2026"></div>
         <div class="col">
           <label>坐山</label>
           <select id="fx-sit">
@@ -133,10 +133,10 @@
     <div class="card">
       <h3>奇门遁甲局</h3>
       <div class="row">
-        <div class="col"><label>年</label><input id="qm-y" type="number" value="2026"></div>
-        <div class="col"><label>月</label><input id="qm-m" type="number" value="6" min="1" max="12"></div>
-        <div class="col"><label>日</label><input id="qm-d" type="number" value="24" min="1" max="31"></div>
-        <div class="col"><label>时(0-23)</label><input id="qm-h" type="number" value="16" min="0" max="23"></div>
+        <div class="col"><label>年</label><input id="qm-y" type="number" inputmode="numeric" value="2026"></div>
+        <div class="col"><label>月</label><input id="qm-m" type="number" inputmode="numeric" value="6" min="1" max="12"></div>
+        <div class="col"><label>日</label><input id="qm-d" type="number" inputmode="numeric" value="24" min="1" max="31"></div>
+        <div class="col"><label>时(0-23)</label><input id="qm-h" type="number" inputmode="numeric" value="16" min="0" max="23"></div>
       </div>
       <button class="btn" id="btn-qm">起 局</button>
       <div class="err" id="err-qm"></div>
@@ -149,8 +149,8 @@
     <div class="card">
       <h3>黄历择日</h3>
       <div class="row">
-        <div class="col"><label>年份</label><input id="zr-y" type="number" value="2026"></div>
-        <div class="col"><label>月份</label><input id="zr-m" type="number" value="8" min="1" max="12"></div>
+        <div class="col"><label>年份</label><input id="zr-y" type="number" inputmode="numeric" value="2026"></div>
+        <div class="col"><label>月份</label><input id="zr-m" type="number" inputmode="numeric" value="8" min="1" max="12"></div>
         <div class="col">
           <label>用途</label>
           <select id="zr-use">
@@ -181,6 +181,7 @@
   "use strict";
   function $(s){return document.querySelector(s);}
   function el(t,c,h){var e=document.createElement(t);if(c)e.className=c;if(h!=null)e.innerHTML=h;return e;}
+  function esc(s){return String(s==null?'':s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];});}
   // tabs
   document.querySelectorAll(".tab").forEach(function(t){
     t.addEventListener("click",function(){
@@ -292,7 +293,7 @@
       var list=FENGSHUI.zeri(y,m,use,BZ.queryAlmanac);
       var box=$("#zr-result");box.innerHTML="";
       var c=el("div","card");
-      c.appendChild(el("h3",null,"择吉 · "+y+"年"+m+"月 · 宜「"+use+"」"));
+      c.appendChild(el("h3",null,"择吉 · "+esc(y)+"年"+esc(m)+"月 · 宜「"+esc(use)+"」"));
       if(!list.length){ c.appendChild(el("div","note","本月黄历中无「"+use+"」宜日，可换月或换用途查看。")); box.appendChild(c); return; }
       var rl=el("div","rilist");
       list.forEach(function(it){

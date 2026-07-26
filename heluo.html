@@ -101,9 +101,9 @@
   <section class="card">
     <h2>起卦 · 填出生时间</h2>
     <div class="form-row">
-      <div class="field"><label>公历年</label><input id="y" type="number" value="1987" min="1901" max="2099" /></div>
-      <div class="field"><label>月</label><input id="m" type="number" value="10" min="1" max="12" /></div>
-      <div class="field"><label>日</label><input id="d" type="number" value="16" min="1" max="31" /></div>
+      <div class="field"><label>公历年</label><input id="y" type="number" inputmode="numeric" value="1987" min="1901" max="2099" /></div>
+      <div class="field"><label>月</label><input id="m" type="number" inputmode="numeric" value="10" min="1" max="12" /></div>
+      <div class="field"><label>日</label><input id="d" type="number" inputmode="numeric" value="16" min="1" max="31" /></div>
       <div class="field"><label>时辰</label>
         <select id="hour">
           <option value="0">子时 23–1</option>
@@ -124,6 +124,7 @@
     </div>
   </section>
 
+  <div id="err-heluo" style="display:none;color:#a83018;background:#fbf4dc;border:1px solid #8a6824;padding:10px 14px;border-radius:8px;margin:12px 0;font-size:14px"></div>
   <div id="result" style="display:none;">
     <section class="card">
       <h2>四柱干支</h2>
@@ -201,6 +202,7 @@
     }
     return html;
   }
+  function esc(s){ return String(s==null?'':s).replace(/[&<>"']/g,function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]; }); }
   function render(q) {
     document.getElementById('result').style.display = 'block';
     var g = q.ganzhi, x = q.xiantian, l = q.luoshu, gua = q.gua;
@@ -229,9 +231,9 @@
     document.getElementById('low_l').textContent = x.lowGua + '（洛书' + l.low + '）';
     document.getElementById('dong_tag').textContent = '动爻：第 ' + x.dong + ' 爻';
     // 卦盘
-    document.getElementById('ben_name').innerHTML = '本命卦 · ' + gua.ben + '<small>上' + gua.benUpper + ' 下' + gua.benLower + '</small>';
+    document.getElementById('ben_name').innerHTML = '本命卦 · ' + esc(gua.ben) + '<small>上' + esc(gua.benUpper) + ' 下' + esc(gua.benLower) + '</small>';
     document.getElementById('ben_yao').innerHTML = yaoHTML(gua.yao, gua.dong);
-    document.getElementById('bian_name').innerHTML = '变卦 · ' + gua.bian + '<small>上' + gua.bianUpper + ' 下' + gua.bianLower + '</small>';
+    document.getElementById('bian_name').innerHTML = '变卦 · ' + esc(gua.bian) + '<small>上' + esc(gua.bianUpper) + ' 下' + esc(gua.bianLower) + '</small>';
     document.getElementById('bian_yao').innerHTML = yaoHTML(gua.yaoChanged, gua.dong);
     // 五行
     document.getElementById('wx').innerHTML =
@@ -252,6 +254,7 @@
     document.getElementById('result').scrollIntoView({behavior:'smooth'});
   }
   document.getElementById('go').addEventListener('click', function () {
+    var er=document.getElementById('err-heluo'); if(er) er.style.display='none';
     var y = +document.getElementById('y').value;
     var m = +document.getElementById('m').value;
     var d = +document.getElementById('d').value;
@@ -260,7 +263,7 @@
     try {
       render(HELUO.query(y, m, d, hour));
     } catch (e) {
-      alert('该日期超出本引擎支持的 1901–2099 范围（公历年初/年末可能对应相邻农历年），请调整。');
+      var er=document.getElementById('err-heluo'); if(er){er.textContent='⚠ 该日期超出本引擎支持的 1901–2099 范围（公历年初/年末可能对应相邻农历年），请调整。'; er.style.display='block';}
     }
   });
   // 默认渲染一次
