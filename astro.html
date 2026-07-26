@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>西占星盘 · Western Astrology Natal Chart</title>
+<style>
+  :root{
+    --bg:#0a1024; --bg2:#0d1633; --ink:#dfe6f5; --ink-dim:#9aa6c4;
+    --gold:#e7c87a; --gold-dim:#b9985a; --silver:#c9d4ee;
+    --line:#26345f; --line2:#1a2547;
+    --c-conj:#d8586a; --c-sex:#5b8fd6; --c-sq:#d8586a; --c-tr:#5fbf8a; --c-opp:#d8586a;
+    --fire:#e0734a; --earth:#9c7b4d; --air:#7fa8d6; --water:#5f9fc0;
+    --card:#0f1838;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0;background:radial-gradient(ellipse at 50% -10%, #16224d 0%, var(--bg) 60%);color:var(--ink);
+    font-family:"Songti SC","STSong","PingFang SC",serif;line-height:1.6;min-height:100vh;}
+  .starfield{position:fixed;inset:0;z-index:0;pointer-events:none;opacity:.5;
+    background-image:radial-gradient(1px 1px at 20% 30%, #fff 50%, transparent),radial-gradient(1px 1px at 70% 20%, #cfe 50%, transparent),
+      radial-gradient(1px 1px at 40% 70%, #fff 50%, transparent),radial-gradient(1px 1px at 85% 60%, #cdf 50%, transparent),
+      radial-gradient(1px 1px at 10% 80%, #fff 50%, transparent),radial-gradient(1px 1px at 60% 90%, #eee 50%, transparent);}
+  .wrap{position:relative;z-index:1;max-width:1080px;margin:0 auto;padding:28px 18px 60px;}
+  h1{font-size:26px;margin:0;color:var(--gold);letter-spacing:2px;}
+  .en{font-size:12px;color:var(--ink-dim);letter-spacing:1px;margin-top:4px;}
+  .decl{margin:18px 0;padding:12px 14px;border:1px dashed var(--line);border-radius:8px;
+    background:rgba(231,200,122,.06);color:var(--ink-dim);font-size:12.5px;}
+  .decl b{color:var(--gold-dim);}
+  form{display:flex;flex-wrap:wrap;gap:10px;background:var(--card);border:1px solid var(--line2);
+    padding:14px;border-radius:10px;margin:14px 0;}
+  .col{display:flex;flex-direction:column;gap:4px;}
+  label{font-size:12px;color:var(--ink-dim);}
+  input,select{background:#0a1228;color:var(--ink);border:1px solid var(--line);border-radius:6px;
+    padding:7px 9px;font-size:14px;font-family:inherit;min-width:64px;}
+  .chk{display:flex;align-items:center;gap:6px;align-self:flex-end;font-size:13px;color:var(--ink-dim);}
+  .btn{align-self:flex-end;background:linear-gradient(180deg,#e7c87a,#b9985a);color:#1a1206;border:none;
+    padding:9px 22px;border-radius:7px;font-size:15px;cursor:pointer;font-family:inherit;font-weight:600;}
+  .btn:hover{filter:brightness(1.08);}
+  .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:16px;margin-top:8px;}
+  .card{background:var(--card);border:1px solid var(--line2);border-radius:12px;padding:16px;}
+  .card h3{margin:0 0 12px;color:var(--gold);font-size:16px;border-bottom:1px solid var(--line2);padding-bottom:8px;letter-spacing:1px;}
+  table{width:100%;border-collapse:collapse;font-size:13.5px;}
+  th,td{text-align:left;padding:6px 8px;border-bottom:1px solid var(--line2);}
+  th{color:var(--gold-dim);font-weight:600;font-size:12px;}
+  td .sym{font-size:17px;color:var(--silver);margin-right:3px;}
+  .retro{color:var(--c-conj);font-size:11px;margin-left:4px;}
+  .chartbox{display:flex;justify-content:center;}
+  svg{max-width:100%;height:auto;}
+  .asp{font-size:12.5px;padding:4px 0;border-bottom:1px dashed var(--line2);}
+  .badge{display:inline-block;padding:1px 7px;border-radius:10px;font-size:11px;margin-right:5px;}
+  .b-conj{background:rgba(216,88,106,.18);color:var(--c-conj);}
+  .b-sex{background:rgba(91,143,214,.18);color:var(--c-sex);}
+  .b-sq{background:rgba(216,88,106,.18);color:var(--c-sq);}
+  .b-tr{background:rgba(95,191,138,.18);color:var(--c-tr);}
+  .b-opp{background:rgba(216,88,106,.18);color:var(--c-opp);}
+  .stat-row{display:flex;gap:10px;flex-wrap:wrap;margin-top:6px;}
+  .stat-item{flex:1;min-width:120px;background:#0a1228;border:1px solid var(--line2);border-radius:8px;padding:10px;}
+  .stat-item .t{font-size:12px;color:var(--ink-dim);}
+  .bar{height:8px;border-radius:4px;background:#0a1228;margin-top:6px;overflow:hidden;}
+  .bar > i{display:block;height:100%;}
+  .note{font-size:12px;color:var(--ink-dim);margin-top:10px;line-height:1.5;}
+  @media(max-width:720px){ h1{font-size:21px;} .grid{grid-template-columns:1fr;} }
+  footer{margin-top:30px;padding:14px;border:1px dashed var(--c-conj);border-radius:8px;
+    color:var(--ink-dim);font-size:12px;background:rgba(216,88,106,.05);}
+</style>
+</head>
+<body>
+<div class="starfield"></div>
+<div class="wrap">
+  <h1>西占星盘 · 本命盘</h1>
+  <div class="en">WESTERN ASTROLOGY · Natal Chart (Equal House) · 深蓝星空</div>
+
+  <div class="decl">
+    <b>计算说明（诚实标注）：</b>本盘行星黄经由 <b>astronomy-engine</b> 地心黄道算法给出；宫位采用
+    <b>等宫制（Equal House）</b>——以上升点 ASC 为第 1 宫首、每 30° 顺黄道划分十二宫（与 Placidus/Koch 等高纬有异）；
+    南北交为 <b>平均交点（Mean Node）</b>近似；ASC/MC 由本地恒星时推导。结果仅供传统文化与象征性参考，非专业占星软件结论。
+  </div>
+
+  <form id="f-astro">
+    <div class="col"><label>出生年</label><input id="ay" type="number" value="1987" min="1900" max="2100"></div>
+    <div class="col"><label>月</label><input id="am" type="number" value="10" min="1" max="12"></div>
+    <div class="col"><label>日</label><input id="ad" type="number" value="16" min="1" max="31"></div>
+    <div class="col"><label>时(24h)</label><input id="ah" type="number" value="12" min="0" max="23"></div>
+    <div class="col"><label>分</label><input id="amn" type="number" value="0" min="0" max="59"></div>
+    <div class="col"><label>出生城市</label><select id="acity"></select></div>
+    <label class="chk"><input id="adst" type="checkbox"> 夏令时(+1h)</label>
+    <button class="btn" id="btn-astro" type="button">排盘</button>
+  </form>
+
+  <div id="astro-result"></div>
+
+  <footer>
+    ⚠️ 以上为玄学体系的传统解读与象征推演，仅供参考。本回复由 AI 生成，不构成医疗、法律、财务或投资建议；命理是参考，不是定数。涉及健康、法律、重大财务决策请咨询相应专业人士。
+  </footer>
+</div>
+
+<script src="js-engine/vendor/node_modules/astronomy-engine/astronomy.browser.min.js"></script>
+<script src="js-engine/src/astro.js"></script>
+<script>
+(function(){
+  var $ = function(s){ return document.querySelector(s); };
+  var PSYM = {Sun:'☉',Moon:'☽',Mercury:'☿',Venus:'♀',Mars:'♂',Jupiter:'♃',Saturn:'♄',Uranus:'♅',Neptune:'♆',Pluto:'♇'};
+  var ASYM = {ASC:'ASC',MC:'MC',DSC:'DSC',IC:'IC',NorthNode:'☊',SouthNode:'☋'};
+
+  // 城市下拉
+  var sel = $('#acity');
+  Object.keys(ASTRO.CITIES).sort().forEach(function(c){ var o=document.createElement('option'); o.value=c; o.textContent=c; sel.appendChild(o); });
+  sel.value = '北京';
+
+  function el(t,c,txt){ var e=document.createElement(t); if(c) e.className=c; if(txt!=null) e.textContent=txt; return e; }
+
+  // 屏幕坐标映射：MC 在顶，ASC 在左
+  function pt(cx,cy,r,lon,mcLon){
+    var phi = (lon - mcLon + 90) * Math.PI/180;
+    return { x: cx + r*Math.sin(phi), y: cy - r*Math.cos(phi) };
+  }
+
+  function drawChart(r){
+    var S=400, cx=200, cy=200, R=170, ri=R-26;
+    var svg = '<svg viewBox="0 0 '+S+' '+S+'" width="400" height="400" xmlns="http://www.w3.org/2000/svg">';
+    svg += '<circle cx="'+cx+'" cy="'+cy+'" r="'+R+'" fill="#0a1228" stroke="#26345f" stroke-width="1.5"/>';
+    svg += '<circle cx="'+cx+'" cy="'+cy+'" r="'+(R-44)+'" fill="none" stroke="#1a2547" stroke-width="1"/>';
+    // 12 宫分隔线 + 星座符号
+    for(var i=0;i<12;i++){
+      var lon = (r.asc.lon + i*30);
+      var a = pt(cx,cy,R, lon, r.mc.lon);
+      var b = pt(cx,cy,R-44, lon, r.mc.lon);
+      svg += '<line x1="'+a.x.toFixed(1)+'" y1="'+a.y.toFixed(1)+'" x2="'+b.x.toFixed(1)+'" y2="'+b.y.toFixed(1)+'" stroke="#1a2547" stroke-width="1"/>';
+      var sm = pt(cx,cy,R-12, lon+15, r.mc.lon);
+      var s = ASTRO.SIGN_SYM[Math.floor(((lon%360)/30))%12];
+      svg += '<text x="'+sm.x.toFixed(1)+'" y="'+sm.y.toFixed(1)+'" fill="#c9d4ee" font-size="16" text-anchor="middle" dominant-baseline="middle">'+s+'</text>';
+    }
+    // 相位线
+    var cmap = {'合':'#d8586a','六合':'#5b8fd6','刑':'#d8586a','拱':'#5fbf8a','冲':'#d8586a'};
+    r.aspects.forEach(function(asp){
+      if(asp.p1.key==='NorthNode'||asp.p1.key==='SouthNode'||asp.p2.key==='NorthNode'||asp.p2.key==='SouthNode') return; // 交点不连线
+      if(asp.p1.house==null && asp.p1.key.indexOf('Node')<0){} 
+      var p1 = pt(cx,cy,ri, asp.p1.lon, r.mc.lon);
+      var p2 = pt(cx,cy,ri, asp.p2.lon, r.mc.lon);
+      var op = (asp.orb>4)?0.25:(asp.orb>1.5?0.45:0.7);
+      svg += '<line x1="'+p1.x.toFixed(1)+'" y1="'+p1.y.toFixed(1)+'" x2="'+p2.x.toFixed(1)+'" y2="'+p2.y.toFixed(1)+'" stroke="'+(cmap[asp.type]||'#888')+'" stroke-width="1" opacity="'+op+'"/>';
+    });
+    // 行星 / 角点
+    function dot(pt0, label, color, big){
+      var rad = big?7:5.5;
+      svg += '<circle cx="'+pt0.x.toFixed(1)+'" cy="'+pt0.y.toFixed(1)+'" r="'+rad+'" fill="'+color+'" stroke="#0a1228" stroke-width="1.5"/>';
+      var tx = pt0.x + (pt0.x-cx)*0.16, ty = pt0.y + (pt0.y-cy)*0.16;
+      var fs = big?13:15;
+      svg += '<text x="'+tx.toFixed(1)+'" y="'+ty.toFixed(1)+'" fill="#dfe6f5" font-size="'+fs+'" text-anchor="middle" dominant-baseline="middle">'+label+'</text>';
+    }
+    r.planets.forEach(function(p){ dot(pt(cx,cy,ri,p.lon,r.mc.lon), PSYM[p.key]||'?', p.retro?'#d8586a':'#e7c87a', false); });
+    r.nodes.forEach(function(n){ dot(pt(cx,cy,ri,n.lon,r.mc.lon), ASYM[n.key]||'☊', '#7fa8d6', false); });
+    r.angles.forEach(function(an){ dot(pt(cx,cy,ri,an.lon,r.mc.lon), an.key, '#e7c87a', true); });
+    svg += '<text x="'+cx+'" y="'+(cy-6)+'" fill="#9aa6c4" font-size="11" text-anchor="middle">MC '+r.mc.name+'</text>';
+    svg += '<text x="'+cx+'" y="'+(cy+12)+'" fill="#9aa6c4" font-size="11" text-anchor="middle">IC '+r.ic.name+'</text>';
+    svg += '</svg>';
+    return svg;
+  }
+
+  function render(r){
+    var box = $('#astro-result'); box.innerHTML='';
+    var grid = el('div','grid');
+
+    // 盘
+    var c1 = el('div','card'); c1.appendChild(el('h3',null,'本命盘 · '+(r.meta.city)));
+    var cb = el('div','chartbox'); cb.innerHTML = drawChart(r); c1.appendChild(cb);
+    c1.appendChild(el('div','note','ASC '+r.asc.name+r.asc.deg.toFixed(1)+'° · MC '+r.mc.name+r.mc.deg.toFixed(1)+'° · 系统 '+r.system+' · UTC '+r.meta.utcISO));
+
+    // 行星
+    var c2 = el('div','card'); c2.appendChild(el('h3',null,'行星落点'));
+    var t = el('table'); t.innerHTML='<tr><th>行星</th><th>星座</th><th>度数</th><th>宫</th></tr>';
+    r.planets.forEach(function(p){
+      var tr=el('tr');
+      tr.innerHTML='<td><span class="sym">'+(PSYM[p.key]||'')+'</span>'+p.cn+(p.retro?'<span class="retro">逆</span>':'')+'</td>'+
+        '<td>'+p.signName+'</td><td>'+p.signDeg.toFixed(2)+'°</td><td>'+p.house+'</td>';
+      t.appendChild(tr);
+    });
+    r.nodes.forEach(function(n){
+      var tr=el('tr');
+      tr.innerHTML='<td><span class="sym">'+(ASYM[n.key]||'')+'</span>'+n.cn+'</td><td>'+n.signName+'</td><td>'+n.signDeg.toFixed(2)+'°</td><td>'+n.house+'</td>';
+      t.appendChild(tr);
+    });
+    c2.appendChild(t);
+
+    // 十二宫
+    var c3 = el('div','card'); c3.appendChild(el('h3',null,'十二宫（等宫制）'));
+    var t3 = el('table'); t3.innerHTML='<tr><th>宫</th><th>宫首星座</th><th>守护星</th></tr>';
+    r.houses.forEach(function(h){
+      var tr=el('tr');
+      tr.innerHTML='<td>'+h.no+'</td><td>'+h.sym+' '+h.name+' '+h.signDeg.toFixed(1)+'°</td><td>'+ASTRO.PLANET_CN[h.ruler]+'</td>';
+      t3.appendChild(tr);
+    });
+    c3.appendChild(t3);
+
+    // 相位
+    var c4 = el('div','card'); c4.appendChild(el('h3',null,'主要相位'));
+    if(r.aspects.length===0) c4.appendChild(el('div','note','无明显主相位。'));
+    r.aspects.slice(0,14).forEach(function(a){
+      var cls = {'合':'b-conj','六合':'b-sex','刑':'b-sq','拱':'b-tr','冲':'b-opp'}[a.type]||'';
+      var d = el('div','asp');
+      d.innerHTML='<span class="badge '+cls+'">'+a.type+'</span>'+a.p1.cn+' ↔ '+a.p2.cn+
+        ' <span style="color:#9aa6c4">('+a.orb.toFixed(1)+'°'+(a.exact?' 准':'')+(a.applying?' 入相':' 出相')+')</span>';
+      c4.appendChild(d);
+    });
+
+    // 统计
+    var c5 = el('div','card'); c5.appendChild(el('h3',null,'元素 / 极性分布'));
+    var sr = el('div','stat-row');
+    var els = [['火',ASTRO.ELEMENTS[0],'var(--fire)'],['土',ASTRO.ELEMENTS[1],'var(--earth)'],['风',ASTRO.ELEMENTS[2],'var(--air)'],['水',ASTRO.ELEMENTS[3],'var(--water)']];
+    var maxe = Math.max.apply(null,r.stats.element.concat([1]));
+    els.forEach(function(e,i){
+      var it=el('div','stat-item'); it.appendChild(el('div','t',e[0]+'象 '+r.stats.element[i]));
+      var bar=el('div','bar'); var ii=el('i'); ii.style.width=(r.stats.element[i]/maxe*100)+'%'; ii.style.background=e[2]; bar.appendChild(ii); it.appendChild(bar); sr.appendChild(it);
+    });
+    c5.appendChild(sr);
+    var sr2 = el('div','stat-row');
+    [['阳',r.stats.polarity[0]],['阴',r.stats.polarity[1]]].forEach(function(p){
+      var it=el('div','stat-item'); it.appendChild(el('div','t',p[0]+' '+p[1]+' 颗')); sr2.appendChild(it);
+    });
+    c5.appendChild(sr2);
+
+    grid.appendChild(c1); grid.appendChild(c2); grid.appendChild(c3); grid.appendChild(c4); grid.appendChild(c5);
+    box.appendChild(grid);
+    box.scrollIntoView({behavior:'smooth',block:'start'});
+  }
+
+  $('#btn-astro').addEventListener('click', function(){
+    try{
+      var r = ASTRO.calc({
+        y:+$('#ay').value, m:+$('#am').value, d:+$('#ad').value,
+        hh:+$('#ah').value, mm:+$('#amn').value, city:$('#acity').value, dst:$('#adst').checked
+      });
+      render(r);
+    }catch(e){ alert('排盘出错：'+e.message); console.error(e); }
+  });
+
+  // 默认排一次
+  try{
+    var r0 = ASTRO.calc({y:1987,m:10,d:16,hh:12,mm:0,city:'北京'});
+    render(r0);
+  }catch(e){ console.error('init', e); }
+})();
+</script>
+</body>
+</html>
